@@ -1,0 +1,2201 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GivemeA+pls - Thế Giới Của Những Cám Dỗ</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Lora, Be Vietnam Pro & Cinzel cho không khí ma mị không bị lỗi font Tiếng Việt -->
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&family=Cinzel:wght@700;900&display=swap" rel="stylesheet">
+    
+    <!-- YouTube IFrame Player API -->
+    <script src="https://www.youtube.com/iframe_api"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        gothic: ['Lora', 'serif'],
+                        sans: ['Be Vietnam Pro', 'sans-serif'],
+                        cinzel: ['Cinzel', 'serif'],
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                        'spin-slow': 'spin 15s linear infinite',
+                        'glow-pulse': 'glow 2s ease-in-out infinite alternate',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom Spooky Glows & Transitions */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        @keyframes glow {
+            from { text-shadow: 0 0 5px #a855f7, 0 0 10px #a855f7; }
+            to { text-shadow: 0 0 15px #ec4899, 0 0 30px #ec4899; }
+        }
+        .spooky-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+        .spooky-scroll::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.8);
+        }
+        .spooky-scroll::-webkit-scrollbar-thumb {
+            background: #6b21a8;
+            border-radius: 3px;
+        }
+        .spooky-scroll::-webkit-scrollbar-thumb:hover {
+            background: #a855f7;
+        }
+        /* Grass blade animation for Chapter 1 */
+        @keyframes sway {
+            0%, 100% { transform: rotate(-3deg); }
+            50% { transform: rotate(3deg); }
+        }
+        .grass-blade {
+            transform-origin: bottom center;
+            animation: sway 3s ease-in-out infinite;
+        }
+        /* Spooky vignette overlay */
+        .vignette {
+            box-shadow: inset 0 0 120px rgba(0,0,0,0.95);
+            pointer-events: none;
+        }
+        /* Glassmorphism utilities */
+        .mystic-dark-glass {
+            background: rgba(8, 8, 16, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(139, 92, 246, 0.15);
+        }
+        .mystic-grey-glass {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(148, 163, 184, 0.25);
+        }
+        .mystic-light-glass {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        }
+        .mystic-glass-active {
+            border-color: rgba(236, 72, 153, 0.6);
+            box-shadow: 0 0 25px rgba(168, 85, 247, 0.35);
+        }
+        /* Highlight selection customization specifically for Chapter 2 and Chapter 4 */
+        .custom-selection::selection {
+            background-color: #ec4899;
+            color: #ffffff;
+            text-shadow: 0 0 5px #ffffff;
+        }
+        /* Torch effect container with CSS variable drive */
+        .torch-active {
+            background: radial-gradient(circle 90px at var(--torch-x, 50%) var(--torch-y, 50%), transparent 100%, #090a10 98%);
+        }
+    </style>
+</head>
+<body class="bg-[#0b0c14] text-gray-200 font-sans min-h-screen overflow-x-hidden relative">
+
+    <!-- Hidden YouTube Player Container -->
+    <div id="ytPlayerContainer" class="hidden"></div>
+
+    <!-- Ambient Grid & Star Dust Background -->
+    <div class="absolute inset-0 z-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-purple-950/10 via-[#0d111d]/90 to-black pointer-events-none"></div>
+    <div class="vignette absolute inset-0 z-30"></div>
+
+    <!-- AUDIO CONTROLLER (Web Audio API Synthesized Ambient Spooky Drone) -->
+    <div class="fixed top-4 right-4 z-50 flex items-center gap-3">
+        <button id="soundToggle" onclick="toggleSpookySound()" class="p-3 rounded-full bg-slate-800/60 border border-slate-700/50 hover:bg-purple-900/60 hover:border-pink-500/50 transition-all duration-300 group shadow-lg shadow-black/40">
+            <span class="sr-only">Toggle Atmosphere Sound</span>
+            <svg id="soundOnIcon" class="w-5 h-5 text-pink-400 group-hover:text-pink-300 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+            </svg>
+            <svg id="soundOffIcon" class="w-5 h-5 text-gray-400 group-hover:text-purple-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
+            </svg>
+        </button>
+        <span class="text-xs font-gothic tracking-widest text-slate-400 hidden sm:inline-block">ÂM THANH NỀN</span>
+    </div>
+
+    <!-- HEADER / NAVIGATION (Bỏ dòng chữ nhỏ lộ bí mật quốc gia) -->
+    <header class="relative z-40 border-b border-slate-800/40 bg-slate-950/60 backdrop-blur-md px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-lg bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-600 flex items-center justify-center shadow-lg shadow-purple-500/10">
+                <span class="font-cinzel text-xl font-bold text-white">A+</span>
+            </div>
+            <div>
+                <h1 class="font-gothic text-lg font-bold tracking-widest text-white">GIVEMEA+PLS</h1>
+                <p class="text-[10px] text-pink-400 tracking-widest font-semibold uppercase">Thế Giới Của Những Cám Dỗ</p>
+            </div>
+        </div>
+        <nav class="flex gap-1 bg-slate-900/80 p-1 rounded-full border border-slate-700/50 shadow-inner">
+            <button onclick="scrollToId('intro-section')" class="px-4 py-1.5 rounded-full text-xs font-semibold hover:text-pink-400 text-slate-300 transition-all">Khởi Đầu</button>
+            <button onclick="scrollToId('hành-trình')" class="px-4 py-1.5 rounded-full text-xs font-semibold hover:text-pink-400 text-slate-300 transition-all">Mật Mã Ma Quái</button>
+            <button onclick="scrollToId('cổng-giải-mã')" class="px-4 py-1.5 rounded-full text-xs font-semibold hover:text-pink-400 text-slate-300 transition-all">Cổng Giải Mã</button>
+            <button id="navHeartBtn" onclick="tryAccessHeart()" class="px-4 py-1.5 rounded-full text-xs font-gothic tracking-wider font-bold text-slate-500 cursor-not-allowed transition-all flex items-center gap-1">
+                <span>HEART OF WORLD</span>
+                <svg class="w-3.5 h-3.5 animate-pulse" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/></svg>
+            </button>
+        </nav>
+    </header>
+
+    <!-- FLOATING INVENTORY (Spooky Box in Slate-Purple Glass) -->
+    <div class="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
+        <div class="bg-slate-900/90 border border-slate-700/60 backdrop-blur-md p-4 rounded-2xl shadow-2xl flex flex-col gap-2 max-w-xs transition-all duration-500 scale-95 origin-bottom-right">
+            <h4 class="text-[10px] font-gothic tracking-widest text-pink-400 font-bold border-b border-slate-800 pb-1.5 uppercase flex items-center justify-between">
+                <span>MẢNH LINH HỒN ĐÃ THU THẬP</span>
+                <span id="collectedCounter" class="text-white bg-purple-900/80 px-1.5 py-0.5 rounded text-[9px] font-mono">0/4</span>
+            </h4>
+            <div class="grid grid-cols-4 gap-2 mt-1">
+                <!-- Word 1 Slot -->
+                <div id="slot-1" onclick="useInventoryWord(1)" class="w-14 h-14 rounded-lg bg-black/40 border border-slate-800 flex flex-col items-center justify-center transition-all duration-300 relative cursor-pointer hover:border-pink-500">
+                    <span class="text-[8px] text-slate-500">Mảnh 1</span>
+                    <span id="word-1" class="text-[10px] font-gothic font-bold text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.5)] hidden animate-bounce">QUYẾT</span>
+                </div>
+                <!-- Word 2 Slot -->
+                <div id="slot-2" onclick="useInventoryWord(2)" class="w-14 h-14 rounded-lg bg-black/40 border border-slate-800 flex flex-col items-center justify-center transition-all duration-300 relative cursor-pointer hover:border-pink-500">
+                    <span class="text-[8px] text-slate-500">Mảnh 2</span>
+                    <span id="word-2" class="text-[10px] font-gothic font-bold text-purple-400 drop-shadow-[0_0_8px_rgba(168,85,247,0.5)] hidden animate-bounce">ĐỊNH</span>
+                </div>
+                <!-- Word 3 Slot -->
+                <div id="slot-3" onclick="useInventoryWord(3)" class="w-14 h-14 rounded-lg bg-black/40 border border-slate-800 flex flex-col items-center justify-center transition-all duration-300 relative cursor-pointer hover:border-pink-500">
+                    <span class="text-[8px] text-slate-500">Mảnh 3</span>
+                    <span id="word-3" class="text-[10px] font-gothic font-bold text-pink-400 drop-shadow-[0_0_8px_rgba(236,72,153,0.5)] hidden animate-bounce">MUA</span>
+                </div>
+                <!-- Word 4 Slot -->
+                <div id="slot-4" onclick="useInventoryWord(4)" class="w-14 h-14 rounded-lg bg-black/40 border border-slate-800 flex flex-col items-center justify-center transition-all duration-300 relative cursor-pointer hover:border-pink-500">
+                    <span class="text-[8px] text-slate-500">Mảnh 4</span>
+                    <span id="word-4" class="text-[10px] font-gothic font-bold text-cyan-400 drop-shadow-[0_0_8px_rgba(34,211,238,0.5)] hidden animate-bounce">HÀNG</span>
+                </div>
+            </div>
+            <p id="invHint" class="text-[9px] text-slate-400 mt-1 italic leading-relaxed text-center">Click vào ô mảnh gỗ trên để đẩy trực tiếp vào phong ấn!</p>
+        </div>
+    </div>
+
+    <!-- MAIN APP WRAPPER -->
+    <main class="relative z-10">
+
+        <!-- PROLOGUE HERO SECTION (TỐI - Huyền bí sâu thẳm) -->
+        <section id="intro-section" class="min-h-[85vh] flex flex-col justify-center items-center text-center px-4 relative bg-[#05060c]">
+            <!-- Elegant Gothic Castle Background Illustration from Unsplash -->
+            <div class="absolute inset-0 bg-cover bg-center opacity-15 pointer-events-none" style="background-image: url('https://images.unsplash.com/photo-1509248961158-e54f6934749c?auto=format&fit=crop&w=1200&q=80');"></div>
+            
+            <div class="max-w-4xl space-y-8 py-12 relative">
+                <!-- Dark Magic Aura -->
+                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] h-[350px] bg-indigo-600/10 blur-[120px] rounded-full animate-pulse-slow pointer-events-none"></div>
+
+                <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/60 border border-slate-800 text-pink-400 text-xs font-semibold tracking-widest uppercase">
+                    <svg class="w-4 h-4 text-pink-500 animate-pulse" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"/></svg>
+                    Sáng tạo vượt giới hạn giảng đường đại học
+                </div>
+
+                <h1 class="font-gothic text-4xl sm:text-6xl md:text-7xl font-black tracking-wider leading-tight text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-100 to-slate-400">
+                    THẾ GIỚI CỦA <br>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-400 drop-shadow-[0_0_20px_rgba(168,85,247,0.3)]">NHỮNG CÁM DỖ</span>
+                </h1>
+
+                <p class="text-sm sm:text-base md:text-lg max-w-2xl mx-auto text-slate-300 font-light leading-relaxed font-sans">
+                    Đã bao giờ bạn tự hỏi "thế lực" vô hình nào đứng đằng sau điều khiển tâm trí khiến bạn ma xui quỷ khiến đổ tiền vào đống đồ mua sắm chưa? Đến nơi Heart of World này, bạn sẽ vén màn sự thật đằng sau!!! Chúng tôi sẽ yểm trợ bạn nên đừng lo lắng nhé!
+                </p>
+
+                <div class="mystic-dark-glass p-6 rounded-2xl max-w-xl mx-auto border border-purple-500/15 text-left space-y-3 shadow-lg shadow-black/50">
+                    <h3 class="font-gothic text-xs tracking-widest text-pink-500 font-bold uppercase flex items-center gap-2">
+                        <span>📜 QUY TẮC TRÒ CHƠI</span>
+                    </h3>
+                    <ul class="text-xs text-slate-400 space-y-2.5 leading-relaxed font-sans">
+                        <li class="flex items-start gap-2">
+                            <span class="text-purple-400 font-bold">•</span>
+                            <span><strong>Truy tìm linh hồn:</strong> Thu thập đủ 4 mảnh vỡ mật mã (mỗi mật mã là một từ đơn ghép lại thành cụm danh từ) đang ẩn giấu khắp dinh thự. Gợi ý: Tên một chương của học phần Marketing này.</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-purple-400 font-bold">•</span>
+                            <span><strong>Vượt qua ảo giác:</strong> Đừng tin vào mắt mình. Hãy bôi đen văn bản, rà chuột tìm điểm mù, hoặc kiên nhẫn chờ đợi trước những bức ảnh để thấy sự thật hiện hình.</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-purple-400 font-bold">•</span>
+                            <span><strong>Hóa giải phong ấn:</strong> Nhập đúng 4 mảnh ghép vào Cổng Giải Mã ở cuối hành trình. Click từng ô phong ấn để chọn mảnh ghép hoặc tự tay gõ lời giải nếu bạn tìm thấy qua phương thức bôi đen!</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-purple-400 font-bold">•</span>
+                            <span><strong>Thấu thị sự thật:</strong> Kẻ sống sót sẽ được mở cửa HEART OF WORLD, nơi phơi bày mọi Sự Thật.</span>
+                        </li>
+                    </ul>
+                    <p class="text-center font-gothic text-xs text-pink-400 pt-2 italic">"Tri thức là ánh sáng duy nhất giúp ngươi thoát khỏi sự điều khiển của bóng tối."</p>
+                </div>
+
+                <div class="pt-6 flex flex-col sm:flex-row gap-4 justify-center items-center">
+                    <button onclick="scrollToId('hành-trình')" class="px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 rounded-full font-gothic font-bold text-sm tracking-widest text-white shadow-[0_0_25px_rgba(168,85,247,0.4)] hover:shadow-[0_0_35px_rgba(236,72,153,0.6)] transform hover:scale-105 transition-all duration-300">
+                        BẮT ĐẦU KHÁM PHÁ
+                    </button>
+                    <a href="#heart-of-world" id="skipBtn" class="px-6 py-3 border border-slate-700 hover:border-purple-500/80 rounded-full font-sans font-semibold text-xs text-slate-300 hover:text-white transition-all hidden">
+                        Cho những ai nóng lòng!!! (Vào xem trực tiếp sản phẩm)
+                    </a>
+                </div>
+
+                <!-- LMS Link Widget -->
+                <div class="text-[11px] text-slate-500 flex flex-wrap justify-center items-center gap-2 pt-4">
+                    <span>Link LMS thế giới chúng mình tại đây:</span>
+                    <a href="https://elearning.uel.edu.vn" target="_blank" class="text-purple-400 hover:text-pink-400 underline transition">BBM2066_21.503_DH_HK252: 252BBM206605 - Nhóm GivemeA+pls</a>
+                </div>
+            </div>
+
+            <!-- Scroll Indicator -->
+            <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 opacity-60">
+                <span class="text-[10px] font-gothic tracking-widest text-slate-400">CUỘN XUỐNG ĐỂ VÀO CỬA</span>
+                <div class="w-6 h-10 border-2 border-slate-700 rounded-full flex justify-center p-1">
+                    <div class="w-1.5 h-3 bg-pink-500 rounded-full animate-bounce"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- GAME JOURNEY SECTION -->
+        <section id="hành-trình" class="py-12 relative">
+
+            <!-- Title Header -->
+            <div class="text-center max-w-2xl mx-auto space-y-3 px-4 mb-24">
+                <span class="font-gothic text-xs tracking-[0.2em] text-pink-500 font-bold uppercase">CÁNH CỔNG DẪN LỐI HỒI I</span>
+                <h2 class="font-gothic text-3xl sm:text-5xl font-extrabold tracking-widest text-white">MẬT MÃ MA QUÁI</h2>
+                <div class="w-24 h-1 bg-gradient-to-r from-purple-500 to-pink-500 mx-auto rounded-full"></div>
+                <p class="text-xs text-slate-400 italic font-light leading-relaxed">Vượt qua ảo giác để phơi bày từng mảnh hồn tri thức...</p>
+            </div>
+
+            <!-- CHAPTER 1: CÁNH ĐỒNG TƯỞNG TƯỢNG (XÁM) -->
+            <div class="bg-gradient-to-b from-[#101524] to-[#1a233a] py-20 px-4 border-y border-slate-800/50">
+                <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                    <div class="lg:col-span-6 space-y-6">
+                        <div class="flex items-center gap-3">
+                            <span class="text-3xl font-bold font-gothic text-slate-600/50">01</span>
+                            <div class="h-[1px] w-12 bg-slate-700"></div>
+                            <span class="text-xs font-gothic tracking-widest text-pink-400 font-bold uppercase">CHƯƠNG 1</span>
+                        </div>
+                        <h3 class="font-gothic text-2xl sm:text-3xl font-extrabold tracking-wider text-white">CÁNH ĐỒNG TƯỞNG TƯỢNG</h3>
+                        
+                        <!-- HIGH-QUALITY UPDATED SCENIC IMAGE: MISTY MEADOW STARRY NIGHT -->
+                        <div class="w-full h-80 rounded-2xl overflow-hidden shadow-2xl border border-slate-700/50 relative group">
+                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent z-10"></div>
+                            <img src="https://media.istockphoto.com/id/615421852/vi/anh/s%C6%B0%C6%A1ng-m%C3%B9-bao-quanh-%C4%91%E1%BB%93ng-c%E1%BB%8F-v%C3%A0o-ban-%C4%91%C3%AAm.jpg?s=612x612&w=0&k=20&c=ph8TWC-CC55WLkp6mpbgF-9y_BbwE5rMtOiNt3tC0qA=" 
+                                 onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1509114397022-ed747cca3f65?w=1200&auto=format&fit=crop';"
+                                 alt="Cánh đồng sương mù kỳ ảo trăng sao huyền dịu mê hoặc" 
+                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                            <div class="absolute bottom-4 left-4 z-20">
+                                <span class="text-xs font-gothic tracking-widest text-pink-400 bg-slate-950/90 px-3.5 py-1.5 rounded-lg font-bold border border-slate-700">SƯƠNG MÙ VÙNG ĐẤT CÂM</span>
+                            </div>
+                        </div>
+
+                        <p class="text-xs sm:text-sm text-slate-300 leading-relaxed font-light italic">
+                            "Dân địa phương không bao giờ bén mảng đến khu vực này sau giờ Ngọ. Họ gọi đây là 'Vùng Đất Câm'. Họ đồn rằng, thứ trồng ở đây không phải là cây cối, mà là những ký ức bị lãng quên. Nếu bạn đi lạc vào đây, những ngọn cỏ sẽ bắt đầu mô phỏng lại những gì bạn sợ hãi nhất, hoặc khao khát nhất. Nó là một mê cung của thị giác. Chúng tôi đã thu thập được một loạt ảnh chụp từ 'Vùng Đất Câm'. Trong hàng tá những ảo ảnh vô hại kia, có một bức ảnh chứa đựng Mảnh Linh Hồn (Manh mối) mà bạn đang tìm kiếm. Nó ẩn mình rất kỹ trong những ngọn cỏ. Hãy nhìn thật sâu, nhưng cẩn thận... đừng để cánh đồng nhìn lại bạn."
+                        </p>
+                        <div class="p-4 bg-slate-800/80 rounded-xl border border-slate-700/50 space-y-2 shadow-inner">
+                            <h4 class="text-xs font-bold text-pink-400 font-gothic tracking-wider">🔑 KEYS:</h4>
+                            <p class="text-xs text-slate-400 leading-relaxed">
+                                "Ảo giác chỉ biến mất khi bạn nhìn thật gần. Đừng đứng từ xa, hãy phóng to tầm mắt của mình vào từng tấc đất. Khi những ngọn cỏ hiện ra rõ nét nhất, 'lời tuyên ngôn' đầu tiên sẽ xuất hiện."
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- INTERACTIVE GAME 1: GRASS FIELD ZOOM -->
+                    <div class="lg:col-span-6 flex flex-col items-center">
+                        <div class="mystic-grey-glass p-4 rounded-3xl w-full max-w-lg aspect-square flex flex-col justify-between overflow-hidden relative">
+                            <!-- Canvas/SVG Container simulating grass field -->
+                            <div class="relative w-full h-[80%] bg-slate-950/90 rounded-2xl border border-slate-800 overflow-hidden flex items-center justify-center">
+                                <!-- SVG Grass Field -->
+                                <svg class="absolute inset-0 w-full h-full text-slate-800/40" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+                                    <rect width="100%" height="100%" fill="#0a0f1d"/>
+                                    <!-- Interactive sway blades -->
+                                    <g id="grass-container"></g>
+                                </svg>
+
+                                <!-- Hidden Text to find -->
+                                <div id="zoom-text-container" class="absolute z-20 pointer-events-none transition-transform duration-500 origin-center text-center scale-[0.1] opacity-0">
+                                    <span class="font-gothic font-extrabold text-xs tracking-[0.3em] text-emerald-400 drop-shadow-[0_0_12px_rgba(52,211,153,0.8)] uppercase">Mảnh hồn thứ nhất</span>
+                                    <div id="key-word-1-btn" onclick="collectWord(1, 'QUYẾT')" class="mt-2 px-6 py-2.5 bg-emerald-500/20 border-2 border-emerald-500 text-emerald-300 font-gothic font-black text-xl tracking-[0.4em] rounded-full hover:bg-emerald-500/40 cursor-pointer pointer-events-auto transition active:scale-95 flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(52,211,153,0.3)]">
+                                        <span>QUYẾT</span>
+                                        <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                    </div>
+                                </div>
+
+                                <div class="absolute inset-0 border-2 border-slate-700/30 pointer-events-none rounded-2xl"></div>
+                                <div class="absolute top-2 left-2 text-[9px] font-gothic text-slate-400 bg-slate-900/80 px-2.5 py-1 rounded border border-slate-700/60">QUANG PHỔ THỊ GIÁC</div>
+                            </div>
+
+                            <!-- Zoom Controller -->
+                            <div class="mt-4 px-2 space-y-2">
+                                <div class="flex justify-between text-xs font-semibold">
+                                    <span class="text-slate-300 font-gothic">Độ thu phóng: <span id="zoomVal" class="text-white font-mono">10%</span></span>
+                                    <span id="zoomStatus" class="text-red-400 italic font-medium">Cỏ dại đang che mờ...</span>
+                                </div>
+                                <input type="range" id="zoomSlider" min="10" max="350" value="10" class="w-full accent-pink-500 h-1.5 bg-slate-950 rounded-lg cursor-pointer">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CHAPTER 2: KHO BÁU BỊ ẨN GIẤU (SÁNG) -->
+            <div class="bg-[#f3f4f6] py-20 px-4 border-y border-slate-200">
+                <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                    <div class="lg:col-span-6 lg:order-last space-y-6">
+                        <div class="flex items-center gap-3">
+                            <span class="text-3xl font-bold font-gothic text-slate-400/80">02</span>
+                            <div class="h-[1px] w-12 bg-slate-300"></div>
+                            <span class="text-xs font-gothic tracking-widest text-indigo-600 font-bold uppercase">CHƯƠNG 2</span>
+                        </div>
+                        <h3 class="font-gothic text-2xl sm:text-3xl font-extrabold tracking-wider text-slate-900">KHO BÁU BỊ ẨN GIẤU</h3>
+                        
+                        <!-- HIGH-QUALITY UPDATED SCENIC IMAGE: SHINING TREASURE CHEST OVERFLOWING WITH GOLD -->
+                        <div class="w-full h-80 rounded-2xl overflow-hidden shadow-2xl border border-slate-300 relative group">
+                            <div class="absolute inset-0 bg-gradient-to-t from-slate-900/30 to-transparent z-10"></div>
+                            <img src="https://img.freepik.com/premium-photo/picture-cave-with-open-treasure-box-filled-with-shiny-gold_1003113-2594.jpg" 
+                                 onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1594122230689-45899d9e6f69?w=1200';"
+                                 alt="Rương kho báu ngập tràn vàng bạc đá quý lộng lẫy rơi vãi lấp lánh" 
+                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                            <div class="absolute bottom-4 left-4 z-20">
+                                <span class="text-xs font-gothic tracking-widest text-indigo-700 bg-white/95 px-3.5 py-1.5 rounded-lg shadow border border-slate-200 font-bold">CHIẾC RƯƠNG VÀNG SÁNG CHÓI</span>
+                            </div>
+                        </div>
+
+                        <!-- UPDATED FONT STYLE TO ARIAL -->
+                        <p class="text-xs sm:text-sm text-slate-700 leading-relaxed font-light italic" style="font-family: Arial, Helvetica, sans-serif;">
+                            "Dưới tầng hầm của gã quản gia quá cố, người ta tìm thấy một chiếc rương sắt hoen gỉ. Nó không chứa vàng, không chứa ngọc. Thứ bên trong là những tờ giấy da cũ kỹ, chi chít những dòng chữ viết bằng loại mực đỏ thẫm đã khô khốc. Kẻ tham lam sẽ chỉ thấy những trang giấy trắng. Nhưng những linh hồn bị phản bội thì khác, họ để lại một thông điệp cuối cùng cho kẻ dám bước tiếp. Kho báu thật sự không nằm ở những gì bạn thấy, mà nằm ở những gì bạn dám 'phơi bày' ra ánh sáng. Hãy cẩn thận, khi sự thật hiện hình, bạn sẽ không thể quay đầu lại được nữa..."
+                        </p>
+                        
+                        <div class="p-4 bg-white rounded-xl border border-slate-200 space-y-2 shadow-sm">
+                            <h4 class="text-xs font-bold text-indigo-600 font-gothic tracking-wider">🔑 KEYS:</h4>
+                            <p class="text-xs text-slate-500 leading-relaxed">
+                                "Bóng tối che mờ tất cả, chỉ khi bạn 'quét sạch' (highlight/bôi đen) căn phòng đầy chữ này, sự thật mới lộ diện. Rà đèn thật sát vùng văn bản màu nhạt bên phải để lột trần nút giải mã."
+                            </p>
+                            <!-- Back-up helper for chapter 2 to prevent getting stuck -->
+                            <button onclick="revealParchmentHint()" class="text-[10px] text-indigo-500 underline block font-semibold mt-1">Gợi ý: Thắp sáng cưỡng bức rương cổ</button>
+                        </div>
+                    </div>
+
+                    <!-- INTERACTIVE GAME 2: LIGHT CONE PARCHMENT -->
+                    <div class="lg:col-span-6 flex flex-col items-center">
+                        <div class="bg-white p-4 rounded-3xl w-full max-w-lg aspect-square flex flex-col justify-between overflow-hidden shadow-xl border border-slate-300/60 relative">
+                            <!-- Interactive Torch Container (supports selection highlighting) -->
+                            <div id="torch-area" class="torch-container custom-selection relative w-full h-full bg-[#fcf8f2] rounded-2xl border border-slate-200 overflow-hidden flex flex-col justify-center items-center p-6 text-justify">
+                                
+                                <!-- Selectable parchment text supporting original bôi đen rule! -->
+                                <div class="space-y-3 font-sans text-xs leading-relaxed text-[#5c4033] select-text z-10 w-full relative">
+                                    <p class="font-semibold text-center italic text-amber-900 border-b border-amber-800/20 pb-1">BẢN CHÉP TAY CỦA SỰ THẬT</p>
+                                    <p>Khi bước qua hầm tối sâu thẳm này, mọi ảo mộng vật chất thông thường đều biến tan. Chỉ còn những dòng huyết tự khắc sâu trên da thú cổ truyền lại lời nguyền.</p>
+                                    <p>Kẻ tham lam sẽ bị che mắt. Hãy dùng sức mạnh của ánh sáng quét lên dòng chữ để thấy chìa khóa giải pháp.</p>
+                                    <p class="text-center font-bold text-sm select-all bg-transparent text-slate-800/0 hover:text-indigo-900 transition-colors py-2 selection:bg-pink-500 selection:text-white">
+                                        🔑 Mảnh ghép thứ hai của lời nguyền là: ĐỊNH
+                                    </p>
+                                    <p class="text-[10px] text-slate-400 text-center italic">(Mẹo: Bạn có thể rà chuột, bôi đen đoạn văn trên hoặc dùng đèn ma thuật bên dưới!)</p>
+                                </div>
+
+                                <!-- Hidden word revealed by lighting -->
+                                <div id="secret-glow" class="absolute inset-0 bg-transparent flex items-center justify-center z-20 pointer-events-none transition-opacity duration-300 opacity-20">
+                                    <div id="key-word-2-btn" onclick="collectWord(2, 'ĐỊNH')" class="px-6 py-2 bg-slate-900/95 border-2 border-indigo-400 text-white font-gothic font-black text-2xl tracking-widest rounded-lg pointer-events-auto cursor-pointer transition active:scale-95 flex items-center gap-2 shadow-xl">
+                                        <span>ĐỊNH</span>
+                                        <svg class="w-4 h-4 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"/></svg>
+                                    </div>
+                                </div>
+
+                                <!-- Black Overlay mimicking the shadow driven by custom css variable -->
+                                <div id="torch-mask" class="torch-active absolute inset-0 z-30 pointer-events-none mix-blend-multiply transition-opacity duration-300"></div>
+
+                                <div class="absolute bottom-2 right-2 text-[9px] font-gothic text-slate-500 bg-white/90 px-2 py-0.5 rounded border border-slate-200 z-40 pointer-events-none shadow">RÀ ĐÈN HOẶC BÔI ĐEN CHỮ TRÊN</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CHAPTER 3: TIẾNG VỌNG TỪ HỐ SÂU (TỐI) -->
+            <div class="bg-[#040408] py-20 px-4 border-y border-slate-950">
+                <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                    <div class="lg:col-span-6 space-y-6">
+                        <div class="flex items-center gap-3">
+                            <span class="text-3xl font-bold font-gothic text-purple-900/60">03</span>
+                            <div class="h-[1px] w-12 bg-purple-950"></div>
+                            <span class="text-xs font-gothic tracking-widest text-pink-500 font-bold uppercase">CHƯƠNG 3</span>
+                        </div>
+                        <h3 class="font-gothic text-2xl sm:text-3xl font-extrabold tracking-wider text-white">TIẾNG VỌNG TỪ HỐ SÂU</h3>
+                        
+                        <!-- HIGH-QUALITY UPDATED SCENIC IMAGE: A DEEP BOTTOMLESS WELL SHAFT -->
+                        <div class="w-full h-80 rounded-2xl overflow-hidden shadow-2xl border border-purple-950/30 relative group">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent z-10"></div>
+                            <img src="https://i1.sndcdn.com/artworks-000132305368-mb4q0u-t500x500.jpg" 
+                                 onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1507166763745-bfe008fbb9f1?w=800';"
+                                 alt="Hố đá sâu thẳm hun hút không thấy đáy vô cùng heo hút" 
+                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                            <div class="absolute bottom-4 left-4 z-20">
+                                <span class="text-xs font-gothic tracking-widest text-pink-400 bg-black/80 px-3.5 py-1.5 rounded-lg border border-purple-950 font-bold">VỰC THẲM THĂM THẲM KHÔNG ĐÁY</span>
+                            </div>
+                        </div>
+
+                        <p class="text-xs sm:text-sm text-slate-300 leading-relaxed font-light italic">
+                            "Càng đi sâu vào mê cung, không gian càng trở nên đặc quánh. Bạn đứng trước một bức tường đá đen kịt, nơi ánh sáng dường như bị nuốt chửng hoàn toàn. Không có bảng chỉ dẫn, không có lối thoát rõ ràng. Nhưng nếu bạn đủ can đảm để chạm tay vào 'hư vô', vào đúng cái tâm điểm của bóng tối ấy, một cánh cửa sẽ mở ra. Hãy nhớ: Đừng tin vào mắt mình, hãy tin vào cảm giác của những ngón tay khi chúng tìm thấy điểm tựa trong bóng đêm."
+                        </p>
+                        <div class="p-4 bg-purple-950/20 rounded-xl border border-purple-900/40 space-y-2">
+                            <h4 class="text-xs font-bold text-pink-400 font-gothic tracking-wider">🔑 KEYS:</h4>
+                            <p class="text-xs text-slate-400 leading-relaxed">
+                                "Trong hầm ngục này, có một điểm mù mà mắt thường không thấy được. Hãy dùng bàn tay của bạn 'quét' thật chậm qua bức ảnh. Khi bàn tay hiện ra, đó là lúc bạn chạm trúng linh hồn của mảnh ghép thứ 3."
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- INTERACTIVE GAME 3: THE DEEP PIT RADAR SENSOR -->
+                    <div class="lg:col-span-6 flex flex-col items-center">
+                        <div class="mystic-dark-glass p-4 rounded-3xl w-full max-w-lg aspect-square flex flex-col justify-between overflow-hidden relative shadow-[0_0_50px_rgba(0,0,0,0.8)]">
+                            <div id="radar-area" class="relative w-full h-full bg-[#020205] rounded-2xl border border-purple-950/60 overflow-hidden flex items-center justify-center cursor-crosshair">
+                                
+                                <!-- Center vortex visualization -->
+                                <div class="absolute w-40 h-40 rounded-full border border-purple-500/10 animate-spin-slow"></div>
+                                <div class="absolute w-20 h-20 rounded-full border border-pink-500/5 animate-pulse-slow"></div>
+                                <div class="absolute w-4 h-4 bg-purple-500/10 blur-md rounded-full"></div>
+
+                                <!-- Animated Radar waves -->
+                                <div id="radar-ping" class="absolute w-12 h-12 rounded-full border-2 border-pink-500/60 scale-0 opacity-0 pointer-events-none transition-all duration-300"></div>
+
+                                <!-- Floating secret word to reveal -->
+                                <div id="vortex-word" class="absolute z-20 pointer-events-none opacity-0 scale-50 transition-all duration-500 text-center">
+                                    <span class="text-[10px] font-gothic text-pink-400 uppercase tracking-widest block mb-2">TIẾNG VỌNG TỪ VỰC THẲM</span>
+                                    <button id="key-word-3-btn" onclick="collectWord(3, 'MUA')" class="px-8 py-3 bg-pink-500/10 border border-pink-500/80 text-pink-400 font-gothic font-black text-2xl tracking-[0.4em] rounded-full hover:bg-pink-500/30 cursor-pointer pointer-events-auto active:scale-95 shadow-[0_0_25px_rgba(236,72,153,0.5)] transition">
+                                        MUA
+                                    </button>
+                                </div>
+
+                                <!-- Sensor stats -->
+                                <div class="absolute top-3 left-3 text-[9px] font-gothic text-purple-400 flex items-center gap-2 bg-black/60 px-2 py-1 rounded border border-purple-900/60">
+                                    <span class="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
+                                    <span>CẢM BIẾN TIỆM CẬN: <span id="proximityVal" class="font-mono text-white">0%</span></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CHAPTER 4: GƯƠNG SOI LINH HỒN (XÁM) -->
+            <div class="bg-[#1f2937] py-20 px-4 border-y border-slate-700">
+                <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                    <div class="lg:col-span-6 lg:order-last space-y-6">
+                        <div class="flex items-center gap-3">
+                            <span class="text-3xl font-bold font-gothic text-slate-400/60">04</span>
+                            <div class="h-[1px] w-12 bg-slate-500"></div>
+                            <span class="text-xs font-gothic tracking-widest text-cyan-400 font-bold uppercase">CHƯƠNG CUỐI</span>
+                        </div>
+                        <h3 class="font-gothic text-2xl sm:text-3xl font-extrabold tracking-wider text-white">GƯƠNG SOI LINH HỒN</h3>
+                        
+                        <!-- HIGH-QUALITY UPDATED SCENIC IMAGE: ANCIENT ARISTOCRATIC MIRROR WITH CRACKS -->
+                        <div class="w-full h-80 rounded-2xl overflow-hidden shadow-2xl border border-slate-600 relative group">
+                            <div class="absolute inset-0 bg-gradient-to-t from-slate-900/50 to-transparent z-10"></div>
+                            <img src="https://img.freepik.com/premium-photo/there-is-mirror-that-is-reflecting-forest-scene-it-generative-ai_1034986-14730.jpg" 
+                                 onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1595151402421-2e86b02657d2?w=1200';"
+                                 alt="Chiếc gương quý tộc châu Âu xưa cũ nứt nẻ và phủ bụi mờ thời gian" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                            <div class="absolute bottom-4 left-4 z-20">
+                                <span class="text-xs font-gothic tracking-widest text-cyan-400 bg-slate-900/95 px-3.5 py-1.5 rounded-lg border border-slate-700 font-bold">ẢO PHÂN ĐA CHIỀU</span>
+                            </div>
+                        </div>
+
+                        <p class="text-xs sm:text-sm text-slate-300 leading-relaxed font-light italic">
+                            "Sau khi rơi xuống vực thẳm, bạn nhận ra mình đang đứng trong một căn phòng đầy những mảnh gương vỡ. Không có lối ra, chỉ có hàng ngàn hình ảnh của bạn đang nhìn ngược lại chính bạn. Nhưng hãy nhìn kỹ... những cái bóng trong gương không hề cử động theo bạn. Chúng có ý chí riêng. Một trong số chúng đang nắm giữ mảnh vỡ cuối cùng để ráp nối toàn bộ sự thật. Đừng nhìn vào hình hài của mình, hãy nhìn vào 'thứ gì đó' đang nấp sau tấm kính. Khi bạn đối diện với nó đủ lâu, cái bóng sẽ thầm thì cho bạn biết tên gọi của sự chiếm hữu này."
+                        </p>
+                        <div class="p-4 bg-slate-800/80 rounded-xl border border-slate-700/50 space-y-2">
+                            <h4 class="text-xs font-bold text-cyan-400 font-gothic tracking-wider">🔑 KEYS:</h4>
+                            <p class="text-xs text-slate-400 leading-relaxed custom-selection">
+                                "Sự thật nằm dưới chân cái bóng, hãy dùng ánh sáng của bạn <span class="font-bold underline text-pink-400 select-all selection:bg-pink-500 selection:text-white">(bôi đen đoạn văn bản ẩn bên dưới)</span> để thấy nó"
+                            </p>
+                            <!-- Selection Trick for traditional players -->
+                            <div class="text-center py-2 select-text custom-selection">
+                                <span class="text-slate-500/0 selection:bg-pink-500 selection:text-white font-gothic font-bold text-sm tracking-widest">🔑 MẢNH GHÉP CUỐI CÙNG LÀ: HÀNG</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- INTERACTIVE GAME 4: THE GLASS LOOK GAUGE -->
+                    <div class="lg:col-span-6 flex flex-col items-center">
+                        <div class="mystic-grey-glass p-4 rounded-3xl w-full max-w-lg aspect-square flex flex-col justify-between overflow-hidden relative shadow-lg">
+                            <div id="mirror-area" onmousedown="startMirrorGaze()" onmouseup="stopMirrorGaze()" onmouseleave="stopMirrorGaze()" ontouchstart="startMirrorGaze()" ontouchend="stopMirrorGaze()" class="relative w-full h-full bg-slate-900 rounded-2xl border border-slate-700/60 overflow-hidden flex items-center justify-center cursor-pointer select-none">
+                                
+                                <div class="absolute inset-4 rounded-xl border-4 border-slate-800 bg-slate-900/60 flex items-center justify-center overflow-hidden">
+                                    <!-- Ghostly Silhouette via SVG -->
+                                    <svg id="mirror-ghost" class="w-48 h-48 text-purple-900/15 transition-all duration-700 filter blur-[1px]" viewBox="0 0 100 100">
+                                        <path fill="currentColor" d="M50,15 C35,15 25,30 25,50 C25,70 10,85 10,90 L90,90 C90,85 75,70 75,50 C75,30 65,15 50,15 Z" />
+                                        <circle cx="40" cy="40" r="4" fill="currentColor" class="opacity-30"/>
+                                        <circle cx="60" cy="40" r="4" fill="currentColor" class="opacity-30"/>
+                                    </svg>
+
+                                    <!-- Hidden keyword overlay (Remains non-clickable due to pointer-events-none unless activated) -->
+                                    <div id="key-word-4-btn" onclick="collectWord(4, 'HÀNG')" class="absolute z-20 pointer-events-none opacity-0 scale-50 transition-all duration-500 text-center">
+                                        <span class="text-[10px] font-gothic text-cyan-400 uppercase tracking-widest block mb-2">SỰ CHIẾM HỮU</span>
+                                        <button class="px-8 py-3 bg-cyan-500/10 border-2 border-cyan-400/80 text-cyan-300 font-gothic font-black text-2xl tracking-[0.4em] rounded-full hover:bg-cyan-500/30 shadow-[0_0_25px_rgba(6,182,212,0.5)]">
+                                            HÀNG
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Progress Bar -->
+                                <div class="absolute bottom-6 flex flex-col items-center gap-2 z-10 pointer-events-none">
+                                    <div class="h-1.5 w-48 bg-slate-950 rounded-full overflow-hidden">
+                                        <div id="gazeProgress" class="h-full bg-gradient-to-r from-cyan-400 to-indigo-500 w-0 transition-all duration-100"></div>
+                                    </div>
+                                    <span id="mirrorInstruct" class="text-[9px] font-gothic text-cyan-300/80 tracking-widest uppercase">ẤN GIỮ VÀO GƯƠNG ĐỂ NHÌN THẤU</span>
+                                </div>
+
+                                <!-- Mirror cracks -->
+                                <svg class="absolute inset-0 w-full h-full text-white/5 pointer-events-none" xmlns="http://www.w3.org/2000/svg">
+                                    <line x1="10" y1="10" x2="90" y2="80" stroke="currentColor" stroke-width="1.5" />
+                                    <line x1="90" y1="20" x2="30" y2="90" stroke="currentColor" stroke-width="1.5" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- CHAPTER FINAL: DECODER GATE (TỐI) -->
+        <section id="cổng-giải-mã" class="py-24 border-t border-slate-900 bg-[#090a12] relative">
+            <div class="max-w-4xl mx-auto px-4 text-center space-y-12">
+                <div class="space-y-4">
+                    <span class="font-gothic text-xs tracking-[0.2em] text-pink-500 font-bold uppercase">CÁNH CỔNG DẪN LỐI HỒI II</span>
+                    <h2 class="font-gothic text-3xl sm:text-5xl font-extrabold tracking-widest text-white">VỪNG ƠI MỞ RA</h2>
+                    <p class="text-xs sm:text-sm text-slate-400 max-w-xl mx-auto leading-relaxed font-light">
+                        "Vậy là đã đến lúc cùng mở khóa Heart of World. Nhưng hành trình đi tìm Sự Thật... chưa bao giờ là dễ dàng. Ải cuối cùng này, bạn phải đúng mật mã cho KẺ GÁC CỔNG. Hãy xem bạn có phải là 'Người được chọn' không nhé?!"
+                    </p>
+                </div>
+
+                <!-- Decryption Seal Gate (Nút click kích hoạt Modal điền tự do) -->
+                <div class="relative max-w-xl mx-auto bg-slate-900/70 p-8 rounded-3xl border border-purple-500/20 space-y-8 shadow-[0_0_40px_rgba(0,0,0,0.6)] overflow-hidden">
+                    <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(139,92,246,0.06)_0%,_transparent_75%)] pointer-events-none"></div>
+
+                    <!-- Seal Slot Container (Clickable to open dialog/modal input) -->
+                    <div class="grid grid-cols-4 gap-3 max-w-md mx-auto relative z-10">
+                        <!-- Box 1 -->
+                        <div id="gate-slot-1" onclick="openGateInputModal(1)" class="aspect-square rounded-2xl bg-black/60 border-2 border-dashed border-slate-800 hover:border-pink-500 flex flex-col items-center justify-center cursor-pointer transition-all duration-300">
+                            <span class="text-[10px] text-slate-600 font-gothic">01 (Gõ/Chọn)</span>
+                            <span id="gate-text-1" class="text-xs sm:text-sm font-gothic font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-green-500"></span>
+                        </div>
+                        <!-- Box 2 -->
+                        <div id="gate-slot-2" onclick="openGateInputModal(2)" class="aspect-square rounded-2xl bg-black/60 border-2 border-dashed border-slate-800 hover:border-pink-500 flex flex-col items-center justify-center cursor-pointer transition-all duration-300">
+                            <span class="text-[10px] text-slate-600 font-gothic">02 (Gõ/Chọn)</span>
+                            <span id="gate-text-2" class="text-xs sm:text-sm font-gothic font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500"></span>
+                        </div>
+                        <!-- Box 3 -->
+                        <div id="gate-slot-3" onclick="openGateInputModal(3)" class="aspect-square rounded-2xl bg-black/60 border-2 border-dashed border-slate-800 hover:border-pink-500 flex flex-col items-center justify-center cursor-pointer transition-all duration-300">
+                            <span class="text-[10px] text-slate-600 font-gothic">03 (Gõ/Chọn)</span>
+                            <span id="gate-text-3" class="text-xs sm:text-sm font-gothic font-black text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-rose-500"></span>
+                        </div>
+                        <!-- Box 4 -->
+                        <div id="gate-slot-4" onclick="openGateInputModal(4)" class="aspect-square rounded-2xl bg-black/60 border-2 border-dashed border-slate-800 hover:border-pink-500 flex flex-col items-center justify-center cursor-pointer transition-all duration-300">
+                            <span class="text-[10px] text-slate-600 font-gothic">04 (Gõ/Chọn)</span>
+                            <span id="gate-text-4" class="text-xs sm:text-sm font-gothic font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500"></span>
+                        </div>
+                    </div>
+
+                    <!-- Custom notification panel -->
+                    <div id="sealStatusPanel" class="text-center p-3 rounded-lg bg-slate-950/60 border border-slate-800 text-xs text-slate-400 max-w-md mx-auto leading-relaxed">
+                        Nhấp trực tiếp vào từng ô <strong class="text-pink-400">01 - 04</strong> ở trên để tự do gõ đáp án hoặc nạp mảnh linh hồn thu được từ rương đồ!
+                    </div>
+
+                    <!-- Activation button -->
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                        <button onclick="clearGate()" class="px-6 py-2.5 rounded-full border border-slate-700 hover:border-pink-500/50 text-xs font-semibold text-slate-400 hover:text-white transition">
+                            Làm sạch phong ấn
+                        </button>
+                        <button onclick="attemptSolveGate()" class="px-10 py-4 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 rounded-full font-gothic font-extrabold text-sm tracking-widest text-white shadow-lg shadow-purple-900/20 active:scale-95 transition-all">
+                            KÍCH HOẠT PHONG ẤN
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- MODAL ĐIỀN CHỮ / CHỌN MẢNH MA THUẬT (Sửa lỗi chưa điền vào được) -->
+        <div id="magicGateModal" class="fixed inset-0 z-50 bg-black/80 flex items-center justify-center px-4 opacity-0 pointer-events-none transition-all duration-300">
+            <div class="mystic-dark-glass p-6 rounded-3xl w-full max-w-md border border-purple-500/30 text-center space-y-6">
+                <div class="space-y-1">
+                    <h3 class="font-gothic text-base text-pink-400 font-bold uppercase tracking-wider">Khai Bản Phong Ấn <span id="modalTargetNum" class="font-mono text-white">X</span></h3>
+                    <p class="text-[11px] text-slate-400">Hãy chọn mảnh ghép có sẵn từ rương đồ hoặc tự tay nhập cổ tự bạn đã giải ảo được!</p>
+                </div>
+
+                <!-- Input box to manually type word -->
+                <div class="space-y-2">
+                    <label class="text-[10px] text-slate-400 block text-left font-bold uppercase">Nhập từ mật mã thủ công:</label>
+                    <input type="text" id="modalInputWord" class="w-full p-3 text-sm rounded-xl border border-purple-950 bg-slate-950 text-white focus:border-pink-500 focus:ring-1 focus:ring-pink-500 outline-none uppercase tracking-widest font-gothic font-bold text-center">
+                </div>
+
+                <!-- Quick Select Section -->
+                <div class="space-y-2">
+                    <span class="text-[10px] text-slate-400 block text-left font-bold uppercase">Hoặc chọn nhanh linh hồn đã lấy:</span>
+                    <div id="modalQuickSelectContainer" class="grid grid-cols-2 gap-2">
+                        <!-- Quick select buttons populated dynamically -->
+                    </div>
+                </div>
+
+                <div class="flex gap-2 pt-2">
+                    <button onclick="closeGateInputModal()" class="w-1/2 py-2.5 rounded-full border border-slate-700 text-xs font-semibold text-slate-300 hover:text-white transition">Hủy bỏ</button>
+                    <button onclick="saveGateModalValue()" class="w-1/2 py-2.5 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-gothic text-xs font-bold shadow-lg shadow-purple-500/10">Xác nhận nạp</button>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- HEART OF WORLD: THE KNOWLEDGE TEMPLE (SÁNG BỪNG - Thiên Đường Tri Thức) -->
+        <section id="heart-of-world" class="hidden py-24 bg-gradient-to-b from-[#f8fafc] via-[#f1f5f9] to-slate-100 text-slate-900 relative border-t-4 border-emerald-500">
+            <!-- Radiant Background Glows -->
+            <div class="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(16,185,129,0.06)_0%,_transparent_70%)] pointer-events-none"></div>
+
+            <div class="max-w-6xl mx-auto px-4 space-y-16 relative z-10">
+                
+                <!-- Portal Unlocked header -->
+                <div class="text-center space-y-4">
+                    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-5 border border-emerald-200 text-emerald-700 text-[10px] font-bold tracking-widest uppercase">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+                        CỔNG TRI THỨC ĐÃ KHAI MỞ - HEART OF WORLD UNLOCKED
+                    </div>
+                    <h2 class="font-gothic text-4xl sm:text-6xl font-black tracking-wider text-slate-900 drop-shadow-sm">
+                        QUÁ TRÌNH QUYẾT ĐỊNH MUA HÀNG
+                    </h2>
+                    <p class="text-xs sm:text-sm text-slate-600 max-w-2xl mx-auto leading-relaxed font-light">
+                        Chào mừng bạn đến với <strong>HEART OF WORLD</strong>! Nơi phơi bày mọi Sự Thật của Quá trình Ra quyết định mua hàng trong học phần Marketing.
+                    </p>
+                </div>
+
+                <!-- 5 STAGES OF BUYING DECISION PROCESS -->
+                <div class="space-y-8">
+                    <div class="flex flex-col sm:flex-row justify-between items-center border-b border-slate-200 pb-4 gap-2">
+                        <h3 class="font-gothic text-xl font-black text-slate-900">5 GIAI ĐOẠN QUÁ TRÌNH RA QUYẾT ĐỊNH</h3>
+                        <span class="text-xs text-emerald-600 font-bold uppercase tracking-widest">Học Phần Marketing UEL</span>
+                    </div>
+
+                    <!-- Pipeline icons -->
+                    <div class="grid grid-cols-2 md:grid-cols-5 gap-3 max-w-5xl mx-auto">
+                        <button onclick="setStage(1)" id="stage-tab-1" class="stage-tab p-4 rounded-2xl flex flex-col items-center gap-2 transition-all duration-300 text-center border border-slate-200 bg-white shadow-sm hover:shadow-md">
+                            <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center font-gothic font-bold text-sm text-slate-500">1</div>
+                            <span class="text-[11px] font-bold text-slate-700">Nhận Biết Nhu Cầu</span>
+                        </button>
+                        <button onclick="setStage(2)" id="stage-tab-2" class="stage-tab p-4 rounded-2xl flex flex-col items-center gap-2 transition-all duration-300 text-center border border-slate-200 bg-white shadow-sm hover:shadow-md">
+                            <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center font-gothic font-bold text-sm text-slate-500">2</div>
+                            <span class="text-[11px] font-bold text-slate-700">Tìm Kiếm Thông Tin</span>
+                        </button>
+                        <button onclick="setStage(3)" id="stage-tab-3" class="stage-tab p-4 rounded-2xl flex flex-col items-center gap-2 transition-all duration-300 text-center border border-slate-200 bg-white shadow-sm hover:shadow-md">
+                            <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center font-gothic font-bold text-sm text-slate-500">3</div>
+                            <span class="text-[11px] font-bold text-slate-700">Đánh Giá Phương Án</span>
+                        </button>
+                        <button onclick="setStage(4)" id="stage-tab-4" class="stage-tab p-4 rounded-2xl flex flex-col items-center gap-2 transition-all duration-300 text-center border border-slate-200 bg-white shadow-sm hover:shadow-md">
+                            <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center font-gothic font-bold text-sm text-slate-500">4</div>
+                            <span class="text-[11px] font-bold text-slate-700">Quyết Định Mua</span>
+                        </button>
+                        <button onclick="setStage(5)" id="stage-tab-5" class="stage-tab p-4 rounded-2xl flex flex-col items-center gap-2 transition-all duration-300 text-center border border-slate-200 bg-white shadow-sm hover:shadow-md col-span-2 md:col-span-1">
+                            <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center font-gothic font-bold text-sm text-slate-500">5</div>
+                            <span class="text-[11px] font-bold text-slate-700">Hành Vi Sau Mua</span>
+                        </button>
+                    </div>
+
+                    <!-- Selected Stage Content Display -->
+                    <div id="stage-display-card" class="bg-white p-6 md:p-8 rounded-3xl border border-slate-200 shadow-xl transition-all duration-500">
+                        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                            <div class="lg:col-span-7 space-y-6">
+                                <div class="flex items-center gap-3">
+                                    <span id="stageNum" class="text-xs font-mono px-2.5 py-1 rounded bg-emerald-5 text-emerald-700 font-semibold border border-emerald-100">GIAI ĐOẠN 1</span>
+                                    <span id="stageStatus" class="text-[10px] text-indigo-600 tracking-wider uppercase font-extrabold">KHỞI NGUỒN CÁM DỖ</span>
+                                </div>
+                                <h4 id="stageTitle" class="font-gothic text-2xl md:text-3xl font-black text-slate-900 leading-tight">NHẬN BIẾT NHU CẦU (NEED RECOGNITION)</h4>
+                                <p id="stageDesc1" class="text-xs sm:text-sm text-slate-600 leading-relaxed font-light font-sans">
+                                    Quá trình mua hàng bắt đầu khi người mua nhận thức được một vấn đề hoặc nhu cầu. Nhu cầu có thể phát sinh bởi các kích thích nội tại (đói, khát) hoặc kích thích bên ngoài (quảng cáo lôi cuốn, mùi hương hấp dẫn).
+                                </p>
+                                <div id="stageCardHighlight" class="p-4 bg-emerald-50/50 rounded-2xl border border-emerald-100 space-y-2">
+                                    <h5 class="text-xs font-bold text-emerald-800 font-gothic">🛡️ Marketer cần làm gì ở giai đoạn này?</h5>
+                                    <p id="stageTactic" class="text-xs text-slate-600 leading-relaxed">
+                                        Nghiên cứu thị trường để tìm ra những khao khát tiềm ẩn của người dùng và phát sóng các kích thích truyền thông kịp thời để khơi nguồn khát vọng mua sắm.
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="lg:col-span-5 flex flex-col justify-center">
+                                <!-- Interactive Widget -->
+                                <div class="p-6 rounded-2xl bg-slate-50 border border-slate-200 text-center space-y-4 shadow-inner">
+                                    <span id="widgetTitle" class="text-[10px] text-slate-400 font-extrabold tracking-wider block uppercase">MÔ PHỎNG KÍCH THÍCH</span>
+                                    
+                                    <div id="stageWidgetBox" class="h-32 flex flex-col items-center justify-center gap-3 text-xs text-slate-700">
+                                        <!-- Injected dynamically -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- NEW ✨ CASE STUDY KHỔNG LỒ: SỮA KUN & KATINAT SAIGON KAFE -->
+                <div class="bg-white p-6 md:p-8 rounded-3xl border border-slate-200 shadow-xl space-y-8">
+                    <div class="text-center space-y-2">
+                        <span class="font-gothic text-xs text-emerald-600 tracking-widest font-bold uppercase">🛡️ Phân Tích Thực Chiến</span>
+                        <h3 class="font-gothic text-2xl sm:text-3xl font-black text-slate-900 leading-tight">MỔ XẺ THƯƠNG HIỆU VIỆT: SỮA KUN & KATINAT</h3>
+                        <p class="text-xs text-slate-500 max-w-xl mx-auto leading-relaxed">
+                            Cùng bóc tách cách thức hai thương hiệu cực hot tại Việt Nam kích hoạt <strong>Quá trình Quyết định mua hàng</strong> để gieo rắc cám dỗ vào tâm trí khách hàng.
+                        </p>
+                    </div>
+
+                    <!-- Tabs Selector for Campaigns -->
+                    <div class="flex justify-center gap-3">
+                        <button onclick="switchBrandCase('kun')" id="btn-case-kun" class="px-6 py-3 rounded-full text-xs font-bold font-gothic transition-all duration-300 bg-emerald-500 text-white shadow-md shadow-emerald-500/10">
+                            🥛 CHIẾN DỊCH SỮA KUN (LOF KUN)
+                        </button>
+                        <button onclick="switchBrandCase('katinat')" id="btn-case-katinat" class="px-6 py-3 rounded-full text-xs font-bold font-gothic transition-all duration-300 bg-slate-100 text-slate-600 border border-slate-200 hover:bg-slate-50">
+                            ☕ LY CẦU VỒNG KATINAT
+                        </button>
+                    </div>
+
+                    <!-- Case Display Box -->
+                    <div id="brandCaseCard" class="bg-slate-50 p-6 md:p-8 rounded-2xl border border-slate-200 shadow-inner space-y-6 transition-all duration-500">
+                        <!-- Content will be swapped by JS -->
+                    </div>
+                </div>
+
+                <!-- NEW ✨ GEMINI LLM INTEGRATION: DETECTOR MIRROR OF TEMPTATIONS -->
+                <div class="bg-gradient-to-tr from-purple-950/20 to-indigo-950/10 p-6 md:p-8 rounded-3xl border border-purple-500/30 shadow-xl space-y-8 relative overflow-hidden">
+                    <div class="absolute inset-0 bg-cover bg-center opacity-5 pointer-events-none" style="background-image: url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=80');"></div>
+                    
+                    <div class="text-center space-y-3 relative z-10">
+                        <div class="inline-flex items-center gap-1 bg-purple-950/80 px-3 py-1 rounded-full border border-purple-500/30 text-xs text-pink-400 font-gothic font-bold">
+                            ✨ CÔNG CỤ TỐI MẬT CHẠY BẰNG TRÍ TUỆ NHÂN TẠO GEMINI ✨
+                        </div>
+                        <h3 class="font-cinzel text-2xl md:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-200 via-pink-300 to-cyan-300">
+                            GƯƠNG THẦN TIÊN TRI CÁM DỖ
+                        </h3>
+                        <p class="text-xs text-slate-600 max-w-xl mx-auto leading-relaxed">
+                            Có phải gần đây bạn đã vô tình "chốt đơn" một món đồ nào đó trong cơn say mê vô thức? Hãy để Gương Thần Neuromarketing bóc trần ảo giác tâm lý đã lôi kéo bạn!
+                        </p>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start relative z-10">
+                        <!-- Input panel -->
+                        <div class="lg:col-span-5 bg-white/75 backdrop-blur border border-slate-200 p-6 rounded-2xl shadow space-y-5">
+                            <div class="space-y-2">
+                                <label class="text-xs font-bold text-slate-700 block uppercase">📦 Món đồ bạn đã mua hoặc thèm muốn:</label>
+                                <input type="text" id="aiItemInput" placeholder="Ví dụ: Ly trà sữa matcha full topping, Vé concert Anh Trai..." class="w-full p-3 text-xs rounded-xl border border-slate-300 bg-white/90 text-slate-900 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 outline-none transition">
+                            </div>
+
+                            <div class="space-y-2">
+                                <div class="flex justify-between text-xs font-bold text-slate-700 uppercase">
+                                    <span>🔥 Độ thèm muốn / mê muội:</span>
+                                    <span id="aiObsessionVal" class="text-pink-600 font-mono">7/10</span>
+                                </div>
+                                <input type="range" id="aiObsessionSlider" min="1" max="10" value="7" oninput="document.getElementById('aiObsessionVal').innerText = this.value + '/10'" class="w-full accent-purple-600 h-1.5 bg-slate-200 rounded-lg cursor-pointer">
+                            </div>
+
+                            <button onclick="invokeTemptationOracle()" class="w-full py-4 bg-gradient-to-r from-purple-600 via-pink-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-gothic font-bold text-xs tracking-wider rounded-full shadow-lg hover:shadow-purple-500/20 transform hover:scale-[1.02] transition active:scale-95 flex items-center justify-center gap-2">
+                                <span>✨ GIẢI MÃ CÁM DỖ BẰNG AI ✨</span>
+                            </button>
+                        </div>
+
+                        <!-- Output panel (Spooky magic paper style) -->
+                        <div class="lg:col-span-7 bg-[#0d0e15] border border-purple-900/60 p-6 rounded-2xl shadow-inner min-h-[280px] flex flex-col justify-between relative group">
+                            <!-- Eerie magic decorative background grid -->
+                            <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(168,85,247,0.03)_0%,_transparent_80%)] pointer-events-none"></div>
+
+                            <div id="aiOutputContent" class="text-xs leading-relaxed text-slate-300 space-y-4 font-sans max-h-[350px] overflow-y-auto spooky-scroll select-text">
+                                <div class="text-center py-12 space-y-3">
+                                    <!-- Idle mirror visual -->
+                                    <svg class="w-12 h-12 text-purple-500/40 mx-auto animate-float" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                    </svg>
+                                    <p class="text-slate-500 font-gothic italic text-center">Hãy nhập dữ liệu lễ vật vào Gương Thần bên trái, ta sẽ phản chiếu cho ngươi thấy sự yếu nhược của tâm hồn trước ma lực tiếp thị...</p>
+                                </div>
+                            </div>
+
+                            <!-- Loading Overlay -->
+                            <div id="aiLoadingOverlay" class="absolute inset-0 bg-[#0d0e15]/95 rounded-2xl flex flex-col items-center justify-center gap-4 transition-opacity duration-300 opacity-0 pointer-events-none z-20">
+                                <div class="relative">
+                                    <div class="w-16 h-16 rounded-full border-4 border-purple-950 border-t-pink-500 animate-spin"></div>
+                                    <div class="absolute inset-0 flex items-center justify-center text-xs font-bold text-purple-400">✨</div>
+                                </div>
+                                <span class="text-xs font-gothic text-purple-300 tracking-widest animate-pulse">Gương Thần Đang Thu Thập Sóng Tâm Thức...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ADDED FEATURE ✨ GEMINI LLM MARKETING DEBATER: THE DEVIL'S ADVOCATE -->
+                <div class="bg-white p-6 md:p-8 rounded-3xl border border-slate-200 shadow-xl space-y-8">
+                    <div class="text-center space-y-2">
+                        <span class="font-gothic text-xs text-purple-600 tracking-widest font-bold uppercase">✨ Rèn luyện Bản Lĩnh UEL ✨</span>
+                        <h3 class="font-gothic text-2xl sm:text-3xl font-black text-slate-900 leading-tight">ÁC QUỶ BIỆN HỘ MARKETING</h3>
+                        <p class="text-xs text-slate-500 max-w-xl mx-auto leading-relaxed">
+                            Nhập thử một ý tưởng hoặc chiến lược Marketing của nhóm bạn. Một "Ác quỷ" phản biện chạy bằng <strong>Gemini AI</strong> sẽ liên tục đặt những câu hỏi truy cùng diệt tận, giúp nhóm bạn tự tin phản biện xuất sắc trước mọi chất vấn trên lớp!
+                        </p>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                        <!-- Left side: Strategy Input -->
+                        <div class="lg:col-span-5 bg-slate-50 border border-slate-200 p-6 rounded-2xl shadow-inner space-y-4">
+                            <div class="space-y-2">
+                                <label class="text-xs font-bold text-slate-700 block uppercase">💡 Ý TƯỞNG / CHIẾN LƯỢC CỦA BẠN:</label>
+                                <textarea id="aiDebateInput" rows="5" placeholder="Ví dụ: Nhóm em định phân phối sữa Kun bằng cách tặng quà lưu niệm tại các trường tiểu học..." class="w-full p-3 text-xs rounded-xl border border-slate-300 bg-white text-slate-900 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition resize-none"></textarea>
+                            </div>
+
+                            <button onclick="invokeDevilAdvocate()" class="w-full py-4 bg-gradient-to-r from-purple-700 to-indigo-700 hover:from-purple-600 hover:to-indigo-600 text-white font-gothic font-bold text-xs tracking-wider rounded-full shadow-lg active:scale-95 transition flex items-center justify-center gap-2">
+                                <span>✨ KÍCH HOẠT ÁC QUỶ PHẢN BIỆN ✨</span>
+                            </button>
+                        </div>
+
+                        <!-- Right side: Spooky Critic output -->
+                        <div class="lg:col-span-7 bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-inner min-h-[250px] flex flex-col justify-between relative">
+                            <div id="aiDebateContent" class="text-xs leading-relaxed text-slate-300 space-y-4 font-sans max-h-[350px] overflow-y-auto spooky-scroll select-text">
+                                <div class="text-center py-10 space-y-3">
+                                    <svg class="w-12 h-12 text-indigo-500/30 mx-auto animate-pulse" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5L6.855 12H13.14l-2.278-4.5A1 1 0 0010 7z" clip-rule="evenodd"/>
+                                    </svg>
+                                    <p class="text-slate-500 italic text-center font-gothic">Nơi đây là tế đàn kiểm thử chiến lược. Hãy đặt ý tưởng lên đây, Ác Quỷ sẽ chỉ ra mọi lỗ hổng tư duy của bạn để sẵn sàng lấy điểm 10!</p>
+                                </div>
+                            </div>
+
+                            <!-- Loading Overlay -->
+                            <div id="aiDebateLoadingOverlay" class="absolute inset-0 bg-[#0d0e15]/95 rounded-2xl flex flex-col items-center justify-center gap-4 transition-opacity duration-300 opacity-0 pointer-events-none z-20">
+                                <div class="relative">
+                                    <div class="w-16 h-16 rounded-full border-4 border-indigo-950 border-t-purple-500 animate-spin"></div>
+                                    <div class="absolute inset-0 flex items-center justify-center text-xs font-bold text-indigo-400">😈</div>
+                                </div>
+                                <span class="text-xs font-gothic text-indigo-300 tracking-widest animate-pulse">Ác Quỷ Đang Phân Tích Lỗ Hổng Chiến Lược...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- INTERACTIVE ROLEPLAY SCENARIO -->
+                <div class="bg-white p-6 md:p-8 rounded-3xl border border-slate-200 shadow-lg space-y-8">
+                    <div class="text-center space-y-2">
+                        <span class="font-gothic text-xs text-emerald-600 tracking-widest font-bold uppercase">👣 NHẬP VAI THỰC TẾ</span>
+                        <h3 class="font-gothic text-2xl font-black text-slate-900">HÀNH TRÌNH TỰ DO CỦA KHÁCH HÀNG UEL</h3>
+                        <p class="text-xs text-slate-500 max-w-lg mx-auto leading-relaxed">
+                            Đóng vai một tân sinh viên trường Đại học Kinh tế - Luật (UEL) trải qua 5 giai đoạn ra quyết định mua sắm chiếc điện thoại mới.
+                        </p>
+                    </div>
+
+                    <!-- Progress Stepper Bubbles -->
+                    <div class="flex items-center justify-center space-x-2 md:space-x-4 max-w-2xl mx-auto pb-4">
+                        <div id="step-dot-1" class="w-8 h-8 rounded-full border-2 border-slate-200 flex items-center justify-center text-xs font-bold transition-all">1</div>
+                        <div class="h-0.5 w-4 md:w-8 bg-slate-200" id="step-line-1"></div>
+                        <div id="step-dot-2" class="w-8 h-8 rounded-full border-2 border-slate-200 flex items-center justify-center text-xs font-bold transition-all">2</div>
+                        <div class="h-0.5 w-4 md:w-8 bg-slate-200" id="step-line-2"></div>
+                        <div id="step-dot-3" class="w-8 h-8 rounded-full border-2 border-slate-200 flex items-center justify-center text-xs font-bold transition-all">3</div>
+                        <div class="h-0.5 w-4 md:w-8 bg-slate-200" id="step-line-3"></div>
+                        <div id="step-dot-4" class="w-8 h-8 rounded-full border-2 border-slate-200 flex items-center justify-center text-xs font-bold transition-all">4</div>
+                        <div class="h-0.5 w-4 md:w-8 bg-slate-200" id="step-line-4"></div>
+                        <div id="step-dot-5" class="w-8 h-8 rounded-full border-2 border-slate-200 flex items-center justify-center text-xs font-bold transition-all">5</div>
+                    </div>
+
+                    <div id="caseBox" class="bg-slate-50 p-6 rounded-2xl border border-slate-200 space-y-6 shadow-inner relative min-h-[250px]">
+                        <!-- Loaded dynamically by JS -->
+                    </div>
+                </div>
+
+                <!-- ACADEMIC QUIZ -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+                    <div class="lg:col-span-5 space-y-6">
+                        <span class="text-xs font-gothic tracking-widest text-emerald-600 font-bold uppercase">QUIZ CHINH PHỤC</span>
+                        <h3 class="font-gothic text-2xl md:text-3xl font-black text-slate-900 leading-tight">VƯỢT ẢI ĐIỂM 10</h3>
+                        <p class="text-xs text-slate-600 leading-relaxed font-light">
+                            Đã nắm rõ tri thức tối mật, giờ hãy chứng minh bạn hoàn toàn xứng đáng nhận điểm số tuyệt đối từ giảng viên UEL!
+                        </p>
+                        
+                        <!-- Premium illustration card for Quiz -->
+                        <div class="w-full h-48 rounded-2xl overflow-hidden shadow border border-slate-200 relative">
+                            <img src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=800&q=80" alt="Học tập nghiên cứu" class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent flex items-end p-4">
+                                <span class="text-white font-gothic text-xs font-bold uppercase tracking-wider">Hội trường học thuật UEL</span>
+                            </div>
+                        </div>
+
+                        <div class="p-4 bg-emerald-5 border border-emerald-100 rounded-xl text-xs text-emerald-800 flex items-start gap-2 shadow-sm">
+                            <svg class="w-5 h-5 flex-shrink-0 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <span>Hoàn thành xuất sắc toàn bộ <strong>10 câu hỏi trắc nghiệm</strong> học thuật dưới đây để chứng minh tri thức tuyệt hảo của bạn!</span>
+                        </div>
+                    </div>
+
+                    <!-- QUIZ PLAYGROUND -->
+                    <div class="lg:col-span-7">
+                        <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-xl space-y-6">
+                            <div id="quiz-screen" class="space-y-6">
+                                <div class="flex justify-between items-center text-xs border-b border-slate-100 pb-3">
+                                    <span class="text-indigo-600 font-bold uppercase tracking-wider">CÂU HỎI <span id="quizNum" class="font-mono text-sm">1</span>/10</span>
+                                    <span id="quizScore" class="text-slate-500 font-mono font-bold">Điểm số: 0</span>
+                                </div>
+                                <h4 id="quizQuestion" class="font-gothic text-sm sm:text-base font-bold text-slate-800 leading-relaxed min-h-[48px]">
+                                    Yếu tố nào sau đây kích hoạt nhận thức nhu cầu bên ngoài?
+                                </h4>
+                                <div id="quizChoices" class="flex flex-col gap-2.5">
+                                    <!-- Injected dynamically -->
+                                </div>
+                            </div>
+                            
+                            <!-- Quiz Result Screen -->
+                            <div id="quiz-result-screen" class="hidden text-center py-8 space-y-4 animate-fade-in">
+                                <div id="quizResultGlow" class="w-20 h-20 bg-emerald-50 border-2 border-emerald-500 rounded-full flex items-center justify-center mx-auto text-emerald-600 text-2xl font-bold animate-pulse">
+                                    0/100
+                                </div>
+                                <h4 class="font-gothic text-xl font-bold text-slate-900">KẾT QUẢ SÁT HẠCH MARKETING</h4>
+                                <p id="quizResultMessage" class="text-xs text-slate-500 max-w-sm mx-auto leading-relaxed">
+                                    Kết quả kiểm tra tri thức hành trình cám dỗ...
+                                </p>
+                                <button onclick="restartQuiz()" class="px-6 py-2 border border-slate-300 hover:border-slate-800 rounded-full text-xs transition text-slate-600 font-semibold shadow-sm">
+                                    Làm lại trắc nghiệm
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TEAM INFORMATION & CREDITS -->
+                <div class="border-t border-slate-200 pt-16 grid grid-cols-1 md:grid-cols-2 gap-8 items-center text-xs text-slate-600 leading-relaxed">
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-2">
+                            <span class="font-gothic text-base font-black text-slate-900 tracking-widest">GIVEMEA+PLS TEAM</span>
+                        </div>
+                        <!-- UPDATED MEMBER NAME -->
+                        <p class="font-light">
+                            Trang web được phát triển bởi Trần Lê Gia Hân (Hannagiatran), một thành viên của nhóm GivemeA+pls nhằm nâng cấp bài thuyết trình chương "Hành vi khách hàng" (môn Marketing) tại trường Đại học Kinh tế - Luật (UEL), ĐHQG-HCM.
+                        </p>
+                        <!-- UPDATED MUSIC DISCLAIMER -->
+                        <p class="font-light text-[11px] text-slate-400">
+                            *Chú ý: Toàn bộ ảnh minh họa (ngoại trừ sơ đồ học thuật) được sưu tầm từ nhiều nguồn Internet, bản quyền thuộc về tác giả gốc. Âm nhạc được sử dụng là loại Nhạc nền không bản quyền
+                        </p>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 flex flex-col gap-3 shadow-md">
+                        <span class="text-[10px] font-bold tracking-widest text-emerald-600 uppercase font-gothic">QUAY TRỞ LẠI HỌC TẬP</span>
+                        <p class="text-[11px] font-light text-slate-500">Hãy cùng nhau tương tác, thảo luận và đánh giá bài báo cáo đề tài của chúng mình trên hệ thống LMS học tập của trường tại đây:</p>
+                        <a href="https://elearning.uel.edu.vn" target="_blank" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-center font-bold transition-all text-xs shadow-sm">
+                            🔗 Truy Cập UEL E-Learning Chính Thức
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="relative z-10 py-8 border-t border-slate-800/20 bg-slate-950 text-center text-[11px] text-slate-500 font-light">
+        <p>&copy; 2026 GivemeA+pls. Phát triển với tâm huyết của Sinh viên UEL cho mục tiêu đạt điểm A+ môn Marketing.</p>
+        <p class="mt-1">Nội dung cốt truyện và tinh thần trò chơi khi mang đi nơi khác cần có sự đồng ý của tác giả.</p>
+    </footer>
+
+    <!-- INTERACTIVE STATE JAVASCRIPT -->
+    <script>
+        // Gemini API Configuration
+        const apiKey = ""; // The execution environment provides the key at runtime
+
+        async function callGemini(prompt, systemInstruction) {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            const payload = {
+                contents: [{ parts: [{ text: prompt }] }],
+                systemInstruction: { parts: [{ text: systemInstruction }] }
+            };
+
+            let delay = 1000;
+            // Exponential Backoff implementation (retry up to 5 times)
+            for (let i = 0; i < 5; i++) {
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    if (response.ok) {
+                        const data = await response.json();
+                        return data.candidates?.[0]?.content?.parts?.[0]?.text;
+                    }
+                } catch (error) {
+                    // Fail silently and retry with delay
+                }
+                await new Promise(resolve => setTimeout(resolve, delay));
+                delay *= 2;
+            }
+            throw new Error("Không thể kết nối đến Gương Thần. Xin lỗi, ma pháp bị chặn do mất năng lượng hoặc lỗi mạng.");
+        }
+
+        async function invokeTemptationOracle() {
+            const itemInput = document.getElementById('aiItemInput').value.trim();
+            const obsessionVal = document.getElementById('aiObsessionSlider').value;
+            const outputBox = document.getElementById('aiOutputContent');
+            const loader = document.getElementById('aiLoadingOverlay');
+
+            if (!itemInput) {
+                showCustomNotification("Hỡi thực thể phàm trần, hãy nhập tên món đồ cần tiên tri trước!");
+                return;
+            }
+
+            // Show Loading
+            loader.classList.remove('opacity-0', 'pointer-events-none');
+            loader.classList.add('opacity-100');
+
+            // Play spooky chime
+            playSpookyBeep(587.33, 'triangle', 0.6, 0.08); // D5
+
+            const systemInstruction = `
+                Bạn là "Pháp sư tối cao của Neuromarketing" từ nhóm GivemeA+pls của trường UEL. 
+                Nhiệm vụ của bạn là nhận vào tên một món đồ mua sắm của người dùng và mức độ "mê muội" (thèm khát) từ 1-10. 
+                Bạn phải bóc trần tâm lý của họ dựa theo "Quá trình Quyết định mua hàng" gồm 5 giai đoạn chính trong Marketing một cách hài hước, mang sắc màu u ám, ma mị nhưng cực kỳ chuẩn xác về mặt học thuật:
+                1. Nhận biết nhu cầu (Kích thích nội tại hay ngoại tại đã bẫy họ?)
+                2. Tìm kiếm thông tin & Đánh giá các phương án (Các marketer đã lung lạc tâm trí họ bằng chiêu trò rà cứu, review hay cấu hình thế nào?)
+                3. Quyết định mua & Hành vi sau mua (Họ có mắc chứng bất hòa nhận thức sau khi tiêu tiền không?)
+                Sau đó, hãy kết thúc bằng một "Thần chú hóa giải" (Lời khuyên lý trí) để giúp họ đề kháng cám dỗ sau này.
+                Hãy trình bày bằng tiếng Việt, phân tách rõ ràng các đầu mục bằng biểu tượng ma thuật huyền bí đen xen như 🔮, 📜, 🕯️, 🕸️ và định dạng markdown đẹp mắt.
+            `;
+
+            const prompt = `Món đồ: "${itemInput}". Mức độ mê muội: ${obsessionVal}/10. Hãy bóc trần hành vi mua hàng của tôi ngay!`;
+
+            try {
+                const responseText = await callGemini(prompt, systemInstruction);
+                
+                // Format response rendering
+                outputBox.innerHTML = `
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-2 border-b border-purple-900/40 pb-2">
+                            <span class="text-pink-400 font-bold text-sm">🔮 TIÊN TRI CHO: ${itemInput.toUpperCase()} (${obsessionVal}/10)</span>
+                        </div>
+                        <div class="text-slate-300 font-sans prose prose-invert text-xs max-w-full leading-relaxed">
+                            ${formatMarkdown(responseText)}
+                        </div>
+                    </div>
+                `;
+                playSpookyBeep(880, 'sine', 0.8, 0.05); // Success high chime
+            } catch (err) {
+                outputBox.innerHTML = `
+                    <div class="text-center py-12 space-y-3">
+                        <span class="text-red-400 text-xs font-bold block">❌ MA PHÁP BỊ ĐỨT QUÃNG</span>
+                        <p class="text-slate-500 text-[11px] font-sans">${err.message}</p>
+                    </div>
+                `;
+            } finally {
+                // Hide Loading
+                loader.classList.add('opacity-0', 'pointer-events-none');
+                loader.classList.remove('opacity-100');
+            }
+        }
+
+        // NEW LLM DRIVEN FUNCTION ✨ ÁC QUỶ BIỆN HỘ MARKETING ✨
+        async function invokeDevilAdvocate() {
+            const debateInput = document.getElementById('aiDebateInput').value.trim();
+            const outputBox = document.getElementById('aiDebateContent');
+            const loader = document.getElementById('aiDebateLoadingOverlay');
+
+            if (!debateInput) {
+                showCustomNotification("Vui lòng nhập ý tưởng Marketing của nhóm bạn trước!");
+                return;
+            }
+
+            // Show Loading
+            loader.classList.remove('opacity-0', 'pointer-events-none');
+            loader.classList.add('opacity-100');
+
+            // Play spooky chime
+            playSpookyBeep(370, 'sawtooth', 0.5, 0.08);
+
+            const systemInstruction = `
+                Bạn đóng vai là "Ác Quỷ Biện Hộ Marketing" - một giáo sư cực kỳ sắc sảo, nghiêm khắc và có giọng điệu ma mị từ thế giới của những cám dỗ trường UEL.
+                Nhiệm vụ của bạn là kiểm tra, phản biện và chỉ ra tất cả các "lỗ hổng tâm lý" hoặc "bất cập thực tiễn" trong ý tưởng Marketing của người dùng.
+                Hãy tập trung phân tích dưới góc nhìn "Quá trình Quyết định mua hàng" của người tiêu dùng (5 giai đoạn).
+                Đặt ra đúng 3 câu hỏi thử thách cực khó, thách thức người dùng phải bảo vệ quan điểm của họ (để giúp họ chuẩn bị cho phần Q&A trên lớp).
+                Giọng điệu: Hài hước, sắc sảo, ma mị, học thuật và mang tính xây dựng cao.
+                Hãy trình bày bằng tiếng Việt với các định dạng markdown tuyệt đẹp, phân tách bằng các emoji u ám như 👹, 💀, ⛓️, 🩸, 🪵.
+            `;
+
+            try {
+                const responseText = await callGemini(debateInput, systemInstruction);
+                
+                outputBox.innerHTML = `
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-2 border-b border-indigo-900/40 pb-2">
+                            <span class="text-purple-400 font-bold text-sm">👹 ÁC QUỶ PHẢN BIỆN CHIẾN LƯỢC</span>
+                        </div>
+                        <div class="text-slate-300 font-sans prose prose-invert text-xs max-w-full leading-relaxed">
+                            ${formatMarkdown(responseText)}
+                        </div>
+                    </div>
+                `;
+                playSpookyBeep(587.33, 'triangle', 0.5, 0.05);
+            } catch (err) {
+                outputBox.innerHTML = `
+                    <div class="text-center py-12 space-y-3">
+                        <span class="text-red-400 text-xs font-bold block">❌ MA PHÁP BỊ GIÁN ĐOẠN</span>
+                        <p class="text-slate-500 text-[11px] font-sans">${err.message}</p>
+                    </div>
+                `;
+            } finally {
+                loader.classList.add('opacity-0', 'pointer-events-none');
+                loader.classList.remove('opacity-100');
+            }
+        }
+
+        // Game Inventory state
+        let inventory = {
+            1: false, // QUYẾT
+            2: false, // ĐỊNH
+            3: false, // MUA
+            4: false  // HÀNG
+        };
+
+        const wordKeys = {
+            1: "QUYẾT",
+            2: "ĐỊNH",
+            3: "MUA",
+            4: "HÀNG"
+        };
+
+        let gateCombination = [null, null, null, null];
+
+        // Spooky Audio Synthesizer (Web Audio API)
+        let audioCtx = null;
+        let ambientOsc = null;
+        let ambientOsc2 = null;
+        let ambientGain = null;
+        let isSoundPlaying = false;
+
+        // YouTube Player integration
+        let ytPlayer = null;
+        let ytPlayerReady = false;
+
+        function onYouTubeIframeAPIReady() {
+            ytPlayer = new YT.Player('ytPlayerContainer', {
+                height: '0',
+                width: '0',
+                videoId: 'Ly9H63SLJJo',
+                playerVars: {
+                    autoplay: 0,
+                    loop: 1,
+                    playlist: 'Ly9H63SLJJo',
+                    controls: 0,
+                    showinfo: 0,
+                    rel: 0
+                },
+                events: {
+                    onReady: onPlayerReady,
+                    onStateChange: onPlayerStateChange
+                }
+            });
+        }
+
+        function onPlayerReady(event) {
+            ytPlayerReady = true;
+            ytPlayer.setVolume(45); // Set reasonable volume level
+        }
+
+        function onPlayerStateChange(event) {
+            if (event.data === YT.PlayerState.ENDED) {
+                ytPlayer.playVideo(); // Loop guarantee
+            }
+        }
+
+        function toggleSpookySound() {
+            // Lazy initialize AudioContext for physical interact SFX beeps/chimes
+            if (!audioCtx) {
+                try {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                } catch(e) {}
+            }
+
+            if (!ytPlayerReady || !ytPlayer) {
+                showCustomNotification("Đang sắm sửa ma âm... Xin vui lòng chờ giây lát!");
+                return;
+            }
+
+            if (isSoundPlaying) {
+                ytPlayer.pauseVideo();
+                isSoundPlaying = false;
+            } else {
+                ytPlayer.playVideo();
+                isSoundPlaying = true;
+                if (audioCtx && audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+            }
+            updateSoundIcons();
+        }
+
+        function updateSoundIcons() {
+            const onIcon = document.getElementById('soundOnIcon');
+            const offIcon = document.getElementById('soundOffIcon');
+            if (isSoundPlaying) {
+                onIcon.classList.remove('hidden');
+                offIcon.classList.add('hidden');
+            } else {
+                onIcon.classList.add('hidden');
+                offIcon.classList.remove('hidden');
+            }
+        }
+
+        function playSpookyBeep(freq, type, duration, vol) {
+            if (!audioCtx || !isSoundPlaying) return;
+            try {
+                let osc = audioCtx.createOscillator();
+                let g = audioCtx.createGain();
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                g.gain.setValueAtTime(vol, audioCtx.currentTime);
+                g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+                osc.connect(g);
+                g.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch (e) {}
+        }
+
+        function scrollToId(id) {
+            const el = document.getElementById(id);
+            if (el) el.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // INVENTORY COLLECTION LOGIC
+        function collectWord(num, word) {
+            inventory[num] = true;
+            document.getElementById(`word-${num}`).classList.remove('hidden');
+            document.getElementById(`slot-${num}`).classList.add('mystic-glass-active');
+            
+            playSpookyBeep(440, 'triangle', 0.5, 0.1);
+            setTimeout(() => { playSpookyBeep(660, 'sine', 0.3, 0.08); }, 150);
+
+            let count = Object.values(inventory).filter(Boolean).length;
+            document.getElementById('collectedCounter').innerText = `${count}/4`;
+
+            showCustomNotification(`Đã thu hoạch được Mảnh ${num}: "${word}"!`);
+            placeInGateSlot(num, word);
+        }
+
+        function showCustomNotification(msg) {
+            const panel = document.getElementById('sealStatusPanel');
+            panel.innerHTML = `<span class="text-pink-400 font-bold">${msg}</span>`;
+            panel.classList.add('border-pink-500/50', 'bg-purple-950/40');
+            setTimeout(() => {
+                panel.classList.remove('border-pink-500/50', 'bg-purple-950/40');
+            }, 3000);
+        }
+
+        function placeInGateSlot(num, word) {
+            gateCombination[num - 1] = word;
+            document.getElementById(`gate-text-${num}`).innerText = word;
+            document.getElementById(`gate-slot-${num}`).classList.add('border-pink-500/80', 'bg-pink-950/20');
+        }
+
+        function useInventoryWord(slotIndex) {
+            const actualWord = wordKeys[slotIndex];
+            if (inventory[slotIndex]) {
+                if (gateCombination[slotIndex - 1] === actualWord) {
+                    gateCombination[slotIndex - 1] = null;
+                    document.getElementById(`gate-text-${slotIndex}`).innerText = "";
+                    document.getElementById(`gate-slot-${slotIndex}`).classList.remove('border-pink-500/80', 'bg-pink-950/20');
+                } else {
+                    placeInGateSlot(slotIndex, actualWord);
+                    playSpookyBeep(330, 'sine', 0.1, 0.1);
+                }
+            } else {
+                showCustomNotification(`Mảnh linh hồn thứ ${slotIndex} chưa được tìm thấy ở các chương! Bạn hãy nhấp vào ô phong ấn để gõ tay trực tiếp nhé.`);
+            }
+        }
+
+        // ACTIVE INPUT GATE DIALOG LOGIC (Fixing 'Chưa điền vào được')
+        let currentTargetGateSlot = null;
+
+        function openGateInputModal(slotNum) {
+            currentTargetGateSlot = slotNum;
+            document.getElementById('modalTargetNum').innerText = `SỐ 0${slotNum}`;
+            
+            // Set current value in input
+            const currentVal = gateCombination[slotNum - 1] || "";
+            document.getElementById('modalInputWord').value = currentVal;
+
+            // Generate quick select buttons
+            const quickSelectBox = document.getElementById('modalQuickSelectContainer');
+            let quickHtml = "";
+            
+            // Show any unlocked words as clickable options
+            let unlockedCount = 0;
+            for (let i = 1; i <= 4; i++) {
+                if (inventory[i]) {
+                    unlockedCount++;
+                    quickHtml += `
+                        <button onclick="setModalInputValue('${wordKeys[i]}')" class="p-2 text-xs font-semibold rounded-xl bg-slate-900 border border-slate-700 hover:border-pink-500 text-slate-300 hover:text-white transition">
+                            Mảnh ${i}: ${wordKeys[i]}
+                        </button>
+                    `;
+                }
+            }
+            if (unlockedCount === 0) {
+                quickHtml = `<span class="col-span-2 text-[10px] text-slate-500 italic">Rương của bạn đang trống rỗng. Hãy gõ đáp án trực tiếp vào ô trên!</span>`;
+            }
+            quickSelectBox.innerHTML = quickHtml;
+
+            // Show Modal
+            const modal = document.getElementById('magicGateModal');
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            playSpookyBeep(350, 'sine', 0.15, 0.05);
+        }
+
+        function setModalInputValue(val) {
+            document.getElementById('modalInputWord').value = val;
+            playSpookyBeep(450, 'sine', 0.1, 0.05);
+        }
+
+        function closeGateInputModal() {
+            const modal = document.getElementById('magicGateModal');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            currentTargetGateSlot = null;
+        }
+
+        function saveGateModalValue() {
+            if (currentTargetGateSlot) {
+                const typedVal = document.getElementById('modalInputWord').value.trim().toUpperCase();
+                
+                if (typedVal) {
+                    gateCombination[currentTargetGateSlot - 1] = typedVal;
+                    document.getElementById(`gate-text-${currentTargetGateSlot}`).innerText = typedVal;
+                    document.getElementById(`gate-slot-${currentTargetGateSlot}`).classList.add('border-pink-500/80', 'bg-pink-950/20');
+                } else {
+                    gateCombination[currentTargetGateSlot - 1] = null;
+                    document.getElementById(`gate-text-${currentTargetGateSlot}`).innerText = "";
+                    document.getElementById(`gate-slot-${currentTargetGateSlot}`).classList.remove('border-pink-500/80', 'bg-pink-950/20');
+                }
+                playSpookyBeep(600, 'sine', 0.2, 0.08);
+            }
+            closeGateInputModal();
+        }
+
+        function clearGate() {
+            gateCombination = [null, null, null, null];
+            for (let i = 1; i <= 4; i++) {
+                document.getElementById(`gate-text-${i}`).innerText = "";
+                document.getElementById(`gate-slot-${i}`).classList.remove('border-pink-500/80', 'bg-pink-950/20');
+            }
+            playSpookyBeep(150, 'sawtooth', 0.3, 0.05);
+            showCustomNotification("Phong ấn đã được gột rửa sạch sẽ.");
+        }
+
+        function attemptSolveGate() {
+            const expected = ["QUYẾT", "ĐỊNH", "MUA", "HÀNG"];
+            let isCorrect = true;
+            for (let i = 0; i < 4; i++) {
+                if (!gateCombination[i] || gateCombination[i].toUpperCase() !== expected[i]) {
+                    isCorrect = false;
+                }
+            }
+
+            if (isCorrect) {
+                playSpookyBeep(523.25, 'sine', 0.2, 0.1);
+                setTimeout(() => { playSpookyBeep(659.25, 'sine', 0.2, 0.1); }, 150);
+                setTimeout(() => { playSpookyBeep(783.99, 'sine', 0.2, 0.1); }, 300);
+                setTimeout(() => { playSpookyBeep(1046.50, 'sine', 0.6, 0.15); }, 450);
+
+                const heart = document.getElementById('heart-of-world');
+                heart.classList.remove('hidden');
+                
+                const navBtn = document.getElementById('navHeartBtn');
+                navBtn.classList.remove('text-slate-500', 'cursor-not-allowed');
+                navBtn.classList.add('text-pink-400', 'hover:text-pink-300');
+                
+                document.getElementById('skipBtn').classList.add('hidden');
+                heart.scrollIntoView({ behavior: 'smooth' });
+
+                showCustomNotification("HỘI CUNG TRI THỨC ĐÃ MỞ! Ánh sáng huyền diệu bừng sáng.");
+                setStage(1);
+                switchBrandCase('kun'); // Default case study view on unlock
+            } else {
+                playSpookyBeep(110, 'sawtooth', 0.6, 0.15);
+                showCustomNotification("PHONG ẤN SAI LỆCH! Hãy kiểm tra lại thứ tự ghép chữ.");
+            }
+        }
+
+        function tryAccessHeart() {
+            const heart = document.getElementById('heart-of-world');
+            if (heart.classList.contains('hidden')) {
+                showCustomNotification("Bạn chưa giải phong ấn! Hãy đi tìm hoặc gõ trực tiếp đủ 4 từ ở Cổng Giải Mã.");
+            } else {
+                scrollToId('heart-of-world');
+            }
+        }
+
+        // CHAPTER 1 GRASS field
+        const grassContainer = document.getElementById('grass-container');
+        function generateGrass() {
+            let html = "";
+            for (let i = 0; i < 110; i++) {
+                let x = Math.random() * 100;
+                let h = 30 + Math.random() * 40;
+                let color = ["#1e293b", "#334155", "#475569", "#0f172a", "#38bdf8", "#ec4899"][Math.floor(Math.random() * 6)];
+                let delay = Math.random() * -3;
+                let duration = 2.5 + Math.random() * 2;
+                html += `
+                    <path class="grass-blade" 
+                          d="M ${x} 100 Q ${x - 2} ${100 - h / 2} ${x + (Math.random() * 8 - 4)} ${100 - h}" 
+                          stroke="${color}" 
+                          stroke-width="${1.2 + Math.random() * 1.5}" 
+                          fill="none" 
+                          style="animation: sway ${duration}s ease-in-out infinite; animation-delay: ${delay}s;" />
+                `;
+            }
+            grassContainer.innerHTML = html;
+        }
+
+        const zoomSlider = document.getElementById('zoomSlider');
+        const zoomTextContainer = document.getElementById('zoom-text-container');
+        const zoomValText = document.getElementById('zoomVal');
+        const zoomStatus = document.getElementById('zoomStatus');
+
+        zoomSlider.addEventListener('input', (e) => {
+            let val = parseInt(e.target.value);
+            zoomValText.innerText = `${val}%`;
+            
+            let scaleVal = val / 100;
+            zoomTextContainer.style.transform = `scale(${scaleVal})`;
+            
+            if (val >= 295 && val <= 305) {
+                zoomTextContainer.style.opacity = "1";
+                zoomStatus.innerText = "SỰ THẬT HIỆN HÌNH!";
+                zoomStatus.className = "text-emerald-400 font-bold animate-pulse";
+                playSpookyBeep(330, 'sine', 0.05, 0.02);
+            } else if (val > 240) {
+                zoomTextContainer.style.opacity = "0.5";
+                zoomStatus.innerText = "Có bóng dáng mờ ảo...";
+                zoomStatus.className = "text-yellow-500 italic";
+            } else {
+                zoomTextContainer.style.opacity = "0";
+                zoomStatus.innerText = "Mơ hồ...";
+                zoomStatus.className = "text-red-400 italic";
+            }
+        });
+
+        // CHAPTER 2 TORCHLIGHT WITH CUSTOM VARIABLES (Fixes Hover/Reveal Issues)
+        const torchArea = document.getElementById('torch-area');
+        const torchMask = document.getElementById('torch-mask');
+        const secretGlow = document.getElementById('secret-glow');
+
+        function updateTorchPosition(clientX, clientY) {
+            const rect = torchArea.getBoundingClientRect();
+            const x = clientX - rect.left;
+            const y = clientY - rect.top;
+            
+            // Set variables for smoother rendering
+            torchArea.style.setProperty('--torch-x', `${x}px`);
+            torchArea.style.setProperty('--torch-y', `${y}px`);
+            
+            const itemRect = document.getElementById('key-word-2-btn').getBoundingClientRect();
+            const itemX = itemRect.left + itemRect.width / 2 - rect.left;
+            const itemY = itemRect.top + itemRect.height / 2 - rect.top;
+            
+            const dist = Math.hypot(x - itemX, y - itemY);
+            // Increase proximity zone to 140px for easier detection
+            if (dist < 140) {
+                secretGlow.classList.remove('opacity-20');
+                secretGlow.classList.add('opacity-100');
+                playSpookyBeep(180, 'triangle', 0.05, 0.015);
+            } else {
+                secretGlow.classList.add('opacity-20');
+                secretGlow.classList.remove('opacity-100');
+            }
+        }
+
+        torchArea.addEventListener('mousemove', (e) => {
+            updateTorchPosition(e.clientX, e.clientY);
+        });
+
+        torchArea.addEventListener('touchmove', (e) => {
+            if (e.touches.length > 0) {
+                updateTorchPosition(e.touches[0].clientX, e.touches[0].clientY);
+            }
+        });
+
+        // Forced hint function for chapter 2 to prevent any blocks
+        function revealParchmentHint() {
+            secretGlow.classList.remove('opacity-20');
+            secretGlow.classList.add('opacity-100');
+            torchArea.style.setProperty('--torch-x', `50%`);
+            torchArea.style.setProperty('--torch-y', `50%`);
+            playSpookyBeep(440, 'sine', 0.2, 0.05);
+            showCustomNotification("Ánh sáng cưỡng bức đã xua tan bóng tối rương cổ!");
+        }
+
+        // CHAPTER 3 VOID RADAR
+        const radarArea = document.getElementById('radar-area');
+        const proximityVal = document.getElementById('proximityVal');
+        const radarPing = document.getElementById('radar-ping');
+        const vortexWord = document.getElementById('vortex-word');
+        const secretSpot = { xPercent: 50, yPercent: 45 };
+
+        radarArea.addEventListener('mousemove', (e) => {
+            const rect = radarArea.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+            
+            const targetX = rect.width * (secretSpot.xPercent / 100);
+            const targetY = rect.height * (secretSpot.yPercent / 100);
+            
+            const distance = Math.hypot(mouseX - targetX, mouseY - targetY);
+            const maxDistance = Math.hypot(rect.width, rect.height);
+            
+            let proximity = Math.max(0, 100 - (distance / maxDistance * 280));
+            proximityVal.innerText = `${Math.round(proximity)}%`;
+
+            if (proximity > 85) {
+                vortexWord.style.opacity = "1";
+                vortexWord.style.transform = "scale(1)";
+                radarPing.style.borderColor = "#ec4899";
+                radarArea.style.boxShadow = "inset 0 0 40px rgba(236,72,153,0.3)";
+                playSpookyBeep(500, 'sine', 0.1, 0.05);
+            } else {
+                vortexWord.style.opacity = "0";
+                vortexWord.style.transform = "scale(0.6)";
+                radarPing.style.borderColor = "rgba(168,85,247,0.4)";
+                radarArea.style.boxShadow = "none";
+            }
+
+            radarPing.style.left = `${mouseX - 24}px`;
+            radarPing.style.top = `${mouseY - 24}px`;
+            radarPing.style.transform = "scale(2.5)";
+            radarPing.style.opacity = `${proximity / 100}`;
+        });
+
+        // CHAPTER 4 MIRROR GAUGE (Removes pointer-events-none upon completion)
+        let gazeInterval = null;
+        let gazePercentage = 0;
+        const gazeProgressBar = document.getElementById('gazeProgress');
+        const mirrorGhost = document.getElementById('mirror-ghost');
+        const mirrorInstruct = document.getElementById('mirrorInstruct');
+        const mirrorWordBtn = document.getElementById('key-word-4-btn');
+
+        function startMirrorGaze() {
+            if (gazeInterval) clearInterval(gazeInterval);
+            mirrorInstruct.innerText = "ĐỐI DIỆN ĐỦ LÂU... KHÔNG ĐƯỢC BUÔNG TAY";
+            gazeInterval = setInterval(() => {
+                if (gazePercentage < 100) {
+                    gazePercentage += 4;
+                    gazeProgressBar.style.width = `${gazePercentage}%`;
+                    mirrorGhost.style.opacity = `${(100 - gazePercentage) / 100}`;
+                    mirrorGhost.style.filter = `blur(${(100 - gazePercentage) / 10}px)`;
+                    playSpookyBeep(200 + (gazePercentage * 4), 'sine', 0.08, 0.03);
+                } else {
+                    clearInterval(gazeInterval);
+                    mirrorWordBtn.style.opacity = "1";
+                    mirrorWordBtn.style.transform = "scale(1)";
+                    mirrorWordBtn.classList.remove('pointer-events-none'); // FIX: Make button clickable once 100%!
+                    mirrorInstruct.innerText = "CHƯƠNG CUỐI HOÀN TẤT - HÃY NHẤP THU THẬP!";
+                    playSpookyBeep(880, 'sine', 0.5, 0.1);
+                }
+            }, 100);
+        }
+
+        function stopMirrorGaze() {
+            if (gazePercentage < 100) {
+                clearInterval(gazeInterval);
+                gazePercentage = 0;
+                gazeProgressBar.style.width = `0%`;
+                mirrorGhost.style.opacity = "0.2";
+                mirrorGhost.style.filter = "blur(1px)";
+                mirrorInstruct.innerText = "GIÁN ĐOẠN! HÃY ẤN GIỮ CHUỘT LẠI";
+            }
+        }
+
+
+        // HEART OF WORLD - ACADEMIC TOPICS (SÁNG - Clean Premium Theme)
+        const stagesData = {
+            1: {
+                title: "NHẬN BIẾT NHU CẦU (NEED RECOGNITION)",
+                status: "KHỞI NGUỒN CÁM DỖ",
+                desc: "Quá trình mua sắm khởi hành từ một khoảng trống lớn giữa tình trạng hiện tại và mục tiêu mong muốn của người dùng. Nhu cầu có thể bùng phát tự nhiên (đói, khát) hoặc thông qua tác động từ các yếu tố kích thích ngoài xã hội. Một chiến dịch tiếp thị tốt là bệ phóng đánh thức khao khát này một cách có chủ đích.",
+                tactic: "Tập trung khơi gợi sự khao khát! Sử dụng chất liệu hình ảnh sống động, nêu bật giải pháp giải toả băn khoăn thầm kín của khách hàng.",
+                widget: `
+                    <div class="flex flex-col items-center gap-1">
+                        <span class="text-[10px] text-slate-500 font-bold">Tần số kích thích ngoài xã hội</span>
+                        <div class="flex gap-1 h-12 items-end bg-slate-200 px-4 py-2 rounded border border-slate-300">
+                            <div class="w-2 bg-emerald-500 h-2 animate-bounce"></div>
+                            <div class="w-2 bg-emerald-500 h-8 animate-bounce" style="animation-delay: 0.2s"></div>
+                            <div class="w-2 bg-emerald-500 h-5 animate-bounce" style="animation-delay: 0.4s"></div>
+                            <div class="w-2 bg-emerald-500 h-10 animate-bounce" style="animation-delay: 0.1s"></div>
+                        </div>
+                        <button onclick="playSpookyBeep(440, 'triangle', 0.5, 0.05)" class="mt-2 text-[9px] px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded shadow-sm">Phát sóng Kích Thích</button>
+                    </div>
+                `
+            },
+            2: {
+                title: "TÌM KIẾM THÔNG TIN (INFORMATION SEARCH)",
+                status: "DÒ TÌM MANH MỐI",
+                desc: "Khi nhu cầu phát triển thành ý chí, người tiêu dùng lên đường 'săn lùng' giải pháp. Họ thu thập tri thức thông qua 4 nguồn: Cá nhân (bạn bè, người thân), Thương mại (quảng cáo, bao bì), Công cộng (đánh giá chuyên sâu trên mạng), và Kinh nghiệm (trực tiếp dùng thử).",
+                tactic: "Tối ưu công cụ tìm kiếm! Bảo đảm thương hiệu xuất hiện ở vị trí trang trọng hàng đầu với những thông tin chuẩn xác và đánh giá khách quan chân thực.",
+                widget: `
+                    <div class="space-y-2 w-full px-4 text-left">
+                        <span class="text-[10px] text-slate-500 font-bold block text-center">Các nguồn thông tin tác động:</span>
+                        <div class="grid grid-cols-2 gap-1 text-[9px]">
+                            <span class="bg-indigo-50 border border-indigo-100 p-1 rounded text-indigo-700">👥 Cá nhân (Gia đình)</span>
+                            <span class="bg-indigo-50 border border-indigo-100 p-1 rounded text-indigo-700">📢 Thương mại (Ads)</span>
+                            <span class="bg-emerald-50 border border-emerald-100 p-1 rounded text-emerald-700">🌐 Công cộng (Review)</span>
+                            <span class="bg-emerald-50 border border-emerald-100 p-1 rounded text-emerald-700">🖐️ Kinh nghiệm</span>
+                        </div>
+                    </div>
+                `
+            },
+            3: {
+                title: "ĐÁNH GIÁ CÁC PHƯƠNG ÁN (EVALUATION OF ALTERNATIVES)",
+                status: "CÂN ĐO ĐONG ĐẾM",
+                desc: "Khách hàng xử lý các thông tin thu nạp được để phân tích và đặt lên bàn cân so sánh giữa nhiều thương hiệu. Họ đánh giá dựa trên tập hợp nhiều thuộc tính cụ thể tùy theo nhu cầu cá nhân tại thời điểm đó.",
+                tactic: "Tăng cường sức mạnh USP (Unique Selling Proposition)! Định vị rõ thuộc tính giá trị cốt lõi xuất sắc vượt trội nhất của sản phẩm.",
+                widget: `
+                    <div class="space-y-1 w-full text-left px-4">
+                        <div class="flex justify-between text-[9px] text-slate-700 font-bold"><span>Camera:</span> <span>9.5/10</span></div>
+                        <div class="h-1 bg-slate-100 rounded overflow-hidden"><div class="h-full bg-emerald-500 w-[95%]"></div></div>
+                        <div class="flex justify-between text-[9px] text-slate-700 font-bold"><span>Hiệu năng UEL:</span> <span>9.0/10</span></div>
+                        <div class="h-1 bg-slate-100 rounded overflow-hidden"><div class="h-full bg-indigo-500 w-[90%]"></div></div>
+                    </div>
+                `
+            },
+            4: {
+                title: "QUYẾT ĐỊNH MUA HÀNG (PURCHASE DECISION)",
+                status: "BƯỚC NHẢY CỦA NIỀM TIN",
+                desc: "Ý định mua hàng đã hình thành, song hành vi mua thực tế vẫn có thể bị chi phối bất ngờ bởi 2 rào cản: Thái độ của những người xung quanh (bạn thân ngăn cản, gia đình khuyên bảo) và Các yếu tố tình huống bất định (đột nhiên thay đổi tình hình tài chính, sản phẩm hết màu ưa thích).",
+                tactic: "Loại bỏ hoàn toàn rào cản tại điểm bán! Đơn giản hóa quy trình thanh toán, cam kết chính sách bảo hành vàng, dùng thử linh hoạt.",
+                widget: `
+                    <div class="flex items-center justify-center gap-1.5 text-[9px] text-slate-700 font-semibold">
+                        <span class="bg-white p-2 rounded border border-slate-200 shadow-sm">Ý Định Mua</span>
+                        <span class="text-emerald-500 font-bold">➡️</span>
+                        <span class="bg-rose-50 border border-rose-100 p-2 rounded text-rose-700">Ý kiến xung quanh</span>
+                        <span class="text-emerald-500 font-bold">➡️</span>
+                        <span class="bg-white p-2 rounded border border-slate-200 shadow-sm">Hành Vi Mua</span>
+                    </div>
+                `
+            },
+            5: {
+                title: "HÀNH VI SAU MUA (POST-PURCHASE BEHAVIOR)",
+                status: "THỎA MÃN HOẶC BẤT HÒA",
+                desc: "Sau khi hoàn thành việc sở hữu, người mua sẽ đặt kỳ vọng ban đầu và trải nghiệm hiệu năng thực tế lên bàn cân so sánh. Nếu sản phẩm xuất sắc vượt quá mong đợi, họ sẽ trở thành sứ giả truyền thông trung thành tự nguyện quảng bá thương hiệu.",
+                tactic: "Nâng cao chất lượng chăm sóc hậu mãi! Thiết lập kênh phản hồi nhiệt tình, gửi lời khuyên hữu ích, bảo dưỡng chu đáo.",
+                widget: `
+                    <div class="space-y-2 text-center w-full px-6">
+                        <span class="text-[9px] text-slate-500 block font-bold">Mức độ hài lòng thực tế:</span>
+                        <input type="range" min="1" max="10" value="9" class="w-full accent-emerald-500 h-1 bg-slate-200 rounded-lg pointer-events-none">
+                        <span class="text-emerald-600 text-[10px] font-bold block animate-bounce">RẤT HÀI LÒNG - SẼ RE-BUY</span>
+                    </div>
+                `
+            }
+        };
+
+        function setStage(num) {
+            document.querySelectorAll('.stage-tab').forEach(btn => {
+                btn.classList.remove('border-emerald-500', 'shadow-md', 'bg-emerald-50/50');
+                btn.querySelector('div').classList.remove('bg-emerald-500', 'text-white');
+                btn.querySelector('div').classList.add('bg-slate-100', 'text-slate-500');
+            });
+
+            const activeBtn = document.getElementById(`stage-tab-${num}`);
+            activeBtn.classList.add('border-emerald-500', 'shadow-md', 'bg-emerald-50/50');
+            const circle = activeBtn.querySelector('div');
+            circle.classList.remove('bg-slate-100', 'text-slate-500');
+            circle.classList.add('bg-emerald-500', 'text-white');
+
+            const info = stagesData[num];
+            document.getElementById('stageNum').innerText = `GIAI ĐOẠN ${num}`;
+            document.getElementById('stageStatus').innerText = info.status;
+            document.getElementById('stageTitle').innerText = info.title;
+            document.getElementById('stageDesc1').innerText = info.desc;
+            document.getElementById('stageTactic').innerText = info.tactic;
+            document.getElementById('stageWidgetBox').innerHTML = info.widget;
+
+            playSpookyBeep(300 + (num * 100), 'sine', 0.15, 0.05);
+        }
+
+        // BRAND CASE STUDIES DATA (Sữa Kun & Katinat) - UPDATED BOTH SPECIFIC IMAGE LINKS
+        const brandCases = {
+            kun: {
+                title: "🥛 SỮA KUN (LOF KUN) - HACK NÃO TRẺ EM, CHIẾM TRỌN VÍ MẸ",
+                subtitle: "Kích hoạt hoàn hảo Giai đoạn 1 (Nhận diện nhu cầu) và Giai đoạn 4 (Yếu tố can thiệp quyết định mua)",
+                image: "https://lh7-rt.googleusercontent.com/docsz/AD_4nXfnkJEp89hNyRhocotKdJCHEWaZRrcjx_ou1kaoGafgkKoB9HVWCM6wRg1Rn6asjx4uTHVwvBkg5Z_YbQdE6cKVBw5XXWl5yNGa_8bRGVlocfOm3aZX5FQm-HYJP1T4Hyy7TD_Alx99AYi7mO5TnA8?key=4Ma7AvJVWX8boWN0uzZy1g4i",
+                overview: "Lof Kun đã cực kỳ khôn ngoan khi không chỉ quảng cáo giá trị dinh dưỡng thông thường của sữa tới phụ huynh, mà họ tập trung gieo rắc kích thích mạnh mẽ trực tiếp lên trẻ nhỏ - đối tượng thụ hưởng nhưng không có quyền quyết định tài chính trực tiếp.",
+                stages: [
+                    {
+                        step: "1. Nhận Biết Nhu Cầu",
+                        detail: "Kun tạo ra vũ trụ hoạt hình 'Gia đình siêu phàm Kun' chiến đấu bảo vệ môi trường. Các kích thích ngoại tại (phim hoạt hình, đồ chơi, thẻ đổi thưởng trong mỗi hộp sữa) kích hoạt mạnh mẽ nhu cầu khẳng định bản thân và giải trí của trẻ nhỏ. Trẻ em phát sinh mong muốn sở hữu sữa Kun tột độ."
+                    },
+                    {
+                        step: "2. Tìm Kiếm Thông Tin",
+                        detail: "Trẻ em không tìm kiếm thông tin trên Google. Chúng rà quét thông tin thông qua việc quan sát bạn bè cùng trang lứa trong lớp mẫu giáo/tiểu học có thẻ Kun siêu phàm, hoặc qua các video kịch tính trên Youtube."
+                    },
+                    {
+                        step: "3. Đánh Giá Phương Án",
+                        detail: "Tiêu chuẩn đánh giá của trẻ nhỏ cực kỳ đơn giản: Sữa nào có nhiều đồ chơi/thẻ đổi quà ngầu hơn thì thắng! Trọng số thuộc tính 'vui chơi' lấn át thuộc tính 'vị ngon'."
+                    },
+                    {
+                        step: "4. Quyết Định Mua Hàng",
+                        detail: "Đây là đỉnh cao! Quyết định mua thuộc về người mẹ (Phụ huynh). Tuy nhiên, rào cản tài chính của mẹ bị phá vỡ bởi áp lực cực lớn từ 'Thái độ của người khác' (đứa con mè nheo, đòi mua bằng được). Đồng thời, Kun khéo léo lồng ghép thông điệp nhân văn 'Mỗi hộp sữa Kun đóng góp quỹ ước mơ' để xoa dịu nỗi lo tài chính và mang lại lý do đạo đức cho người mẹ ra quyết định chốt đơn."
+                    },
+                    {
+                        step: "5. Hành Vi Sau Mua",
+                        detail: "Trẻ em thỏa mãn tột độ khi tích đủ thẻ đổi balo, bình nước. Người mẹ cảm thấy nhẹ lòng vì con ngoan ngoãn uống sữa. Sự bất hòa nhận thức bị triệt tiêu."
+                    }
+                ]
+            },
+            katinat: {
+                title: "☕ KATINAT SAIGON KAFE - CHIẾC LY CẦU VỒNG LÀM CHAO ĐẢO GIỚI TRẺ",
+                subtitle: "Làm chủ Giai đoạn 2 (Tìm kiếm thông tin) và Giai đoạn 3 (Đánh giá phương án bằng thuộc tính xã hội)",
+                image: "https://img.lazcdn.com/g/p/f0cab7fcece2700a76fdd6278c7b8053.jpg_720x720q80.jpg",
+                overview: "Katinat không chỉ bán cà phê; họ bán một phụ kiện phong cách sống và trải nghiệm xã hội. Chiến dịch ra mắt ly cầu vồng đổi màu là một minh chứng kinh điển cho thấy thiết kế bao bì có thể bóp nghẹt lý trí mua sắm của giới trẻ như thế nào.",
+                stages: [
+                    {
+                        step: "1. Nhận Biết Nhu Cầu",
+                        detail: "Nhu cầu không đơn thuần là khát nước (kích thích sinh lý). Đó là nhu cầu thuộc về xã hội (Social Needs) - khao khát được thuộc về nhóm người sành điệu, bắt trend, không bị bỏ lại phía sau (FOMO). Chiếc ly lấp lánh xuất hiện dày đặc kích hoạt mong muốn tự thể hiện của gen Z."
+                    },
+                    {
+                        step: "2. Tìm Kiếm Thông Tin",
+                        detail: "Thông tin bùng nổ tự nhiên qua nguồn lực Công Cộng (Public sources) - hàng vạn bức ảnh check-in lộng lẫy trên TikTok, Instagram, Threads. Người tiêu dùng bị bao vây bởi các đánh giá và hình ảnh thực tế từ chính bạn bè mình."
+                    },
+                    {
+                        step: "3. Đánh Giá Phương Án",
+                        detail: "Khi so sánh các quán cà phê, Katinat đã thay đổi hoàn toàn trọng số thuộc tính. Khách hàng không còn so sánh 'vị cà phê đậm đà' (Phúc Long) hay 'không gian làm việc' (The Coffee House) nữa. Thuộc tính hàng đầu lúc này là: 'Ly nước chụp hình lên mạng xã hội có ngầu không?'. Chiếc ly cầu vồng độc quyền đẩy điểm đánh giá của Katinat lên tuyệt đối."
+                    },
+                    {
+                        step: "4. Quyết Định Mua Hàng",
+                        detail: "Katinat tạo ra rào cản 'sự khan hiếm' (chỉ tặng ly khi mua trà sữa chôm chôm trong khung giờ giới hạn). Sự khan hiếm này kích hoạt tâm lý sợ bỏ lỡ, đẩy nhanh tốc độ chốt đơn. Người trẻ sẵn sàng xếp hàng 2 tiếng đồng hồ để mua ly nước."
+                    },
+                    {
+                        step: "5. Hành Vi Sau Mua",
+                        detail: "Khách hàng lập tức đăng ảnh khoe chiếc ly lên trang cá nhân. Sự thỏa mãn xã hội cực cao lấn át việc nước uống có thể hơi ngọt hay xếp hàng hơi mệt. Họ trở thành đại sứ thương hiệu tự nguyện lan truyền chiến dịch."
+                    }
+                ]
+            }
+        };
+
+        function switchBrandCase(brandKey) {
+            const data = brandCases[brandKey];
+            const btnKun = document.getElementById('btn-case-kun');
+            const btnKatinat = document.getElementById('btn-case-katinat');
+            
+            // Toggle active classes for buttons
+            if (brandKey === 'kun') {
+                btnKun.className = "px-6 py-3 rounded-full text-xs font-bold font-gothic transition-all duration-300 bg-emerald-500 text-white shadow-md shadow-emerald-500/20";
+                btnKatinat.className = "px-6 py-3 rounded-full text-xs font-bold font-gothic transition-all duration-300 bg-slate-100 text-slate-600 border border-slate-200 hover:bg-slate-50";
+                playSpookyBeep(400, 'triangle', 0.2, 0.05);
+            } else {
+                btnKatinat.className = "px-6 py-3 rounded-full text-xs font-bold font-gothic transition-all duration-300 bg-indigo-600 text-white shadow-md shadow-indigo-600/20";
+                btnKun.className = "px-6 py-3 rounded-full text-xs font-bold font-gothic transition-all duration-300 bg-slate-100 text-slate-600 border border-slate-200 hover:bg-slate-50";
+                playSpookyBeep(500, 'triangle', 0.2, 0.05);
+            }
+
+            // Build interactive timeline layout
+            let stagesHtml = "";
+            data.stages.forEach((stg, i) => {
+                stagesHtml += `
+                    <div class="flex items-start gap-4 p-4 rounded-xl bg-white border border-slate-200 shadow-sm hover:shadow-md transition">
+                        <div class="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center font-bold text-xs bg-indigo-50 text-indigo-600 border border-indigo-100">${i+1}</div>
+                        <div>
+                            <h5 class="font-gothic font-bold text-slate-800 text-xs sm:text-sm">${stg.step}</h5>
+                            <p class="text-xs text-slate-600 mt-1 leading-relaxed">${stg.detail}</p>
+                        </div>
+                    </div>
+                `;
+            });
+
+            document.getElementById('brandCaseCard').innerHTML = `
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                    <div class="lg:col-span-7 space-y-4">
+                        <span class="text-[10px] px-2 py-1 rounded bg-indigo-50 text-indigo-700 font-bold border border-indigo-100 uppercase font-mono">BÁO CÁO PHÂN TÍCH</span>
+                        <h4 class="font-gothic text-lg sm:text-xl font-black text-slate-800 leading-tight">${data.title}</h4>
+                        <p class="text-xs text-slate-500 italic font-medium">${data.subtitle}</p>
+                        <p class="text-xs text-slate-600 leading-relaxed font-light">${data.overview}</p>
+                    </div>
+                    <div class="lg:col-span-5">
+                        <div class="w-full h-44 rounded-2xl overflow-hidden border border-slate-200 shadow shadow-inner">
+                            <img src="${data.image}" alt="${data.title}" class="w-full h-full object-cover">
+                        </div>
+                    </div>
+                </div>
+                <div class="border-t border-slate-200 pt-6">
+                    <h5 class="font-gothic font-bold text-xs text-slate-500 tracking-wider uppercase mb-4">🗺️ 5 GIAI ĐOẠN HÀNH TRÌNH TÂM LÝ KHÁCH HÀNG:</h5>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
+                        ${stagesHtml}
+                    </div>
+                </div>
+            `;
+        }
+
+        // ROLEPLAY CASE STUDY UEL
+        const caseSteps = [
+            {
+                step: 1,
+                title: "BƯỚC 1: NHẬN DIỆN VẤN ĐỀ",
+                prompt: "Chiếc điện thoại cũ hỏng đúng tuần thi học kỳ. Bạn không thể tra cứu slide bài giảng môn Marketing của cô Dung được nữa. Bạn bối rối tột cùng.",
+                options: [
+                    { text: "Ngoảnh mặt làm ngơ, đi mượn tập giấy của bạn thân học bài.", correct: false, feedback: "Bạn đang trốn tránh nhu cầu thực tế! Điều này không giải quyết triệt để nhu cầu học tập khẩn cấp của bạn, Marketer sẽ khó can thiệp khi bạn không muốn thay đổi." },
+                    { text: "Nhận ra khoảng trống lớn: Cần mua smartphone mới ngay lập tức để giành điểm A+.", correct: true, feedback: "Chính xác! Nhu cầu mua sắm chính thức được kích hoạt do sự xuất hiện của 'Kích thích nội tại' (sự bất tiện khi thiếu công cụ học tập)." }
+                ]
+            },
+            {
+                step: 2,
+                title: "BƯỚC 2: TÌM KIẾM THÔNG TIN",
+                prompt: "Bạn bắt đầu tìm kiếm chiếc smartphone phù hợp để thay thế. Bạn sẽ ưu tiên nguồn lực tìm kiếm nào nhất?",
+                options: [
+                    { text: "Hỏi han trực tiếp review chân thực từ các sinh viên khoá trên tại UEL.", correct: true, feedback: "Tuyệt vời! Bạn tin tưởng nguồn lực cá nhân và công cộng hơn quảng cáo hào nhoáng. Trong marketing học thuật, nguồn cá nhân có tính thuyết phục cao nhất." },
+                    { text: "Tin hoàn toàn vào clip quảng cáo của hãng di động lớn trên Tiktok.", correct: false, feedback: "Nguồn thương mại rất hấp dẫn và sống động, nhưng thường có độ tin cậy thấp nhất vì nhãn hàng luôn muốn nói tốt về họ." }
+                ]
+            },
+            {
+                step: 3,
+                title: "BƯỚC 3: ĐÁNH GIÁ PHƯƠNG ÁN",
+                prompt: "Đứng giữa dòng smartphone cao cấp đời mới nhất và chiếc điện thoại phân khúc tầm trung. Smartphone cao cấp có máy ảnh siêu nét nhưng giá lại đắt đỏ so với thu nhập sinh viên.",
+                options: [
+                    { text: "Mua ngay dòng đắt tiền nhất, nợ thẻ tín dụng để tính sau.", correct: false, feedback: "Quyết định tài chính mạo hiểm! Bạn chưa cân nhắc kỹ tập hợp các thuộc tính sản phẩm thiết thực và điều kiện ràng buộc thực tế." },
+                    { text: "Lập bảng cân đối cấu hình, thời lượng pin và giá cả vừa phải phù hợp với nhu cầu sinh viên.", correct: true, feedback: "Tuyệt vời! Bạn là người mua sắm lý trí, biết áp dụng Mô hình đa thuộc tính để tối ưu hóa quyết định chi tiêu." }
+                ]
+            },
+            {
+                step: 4,
+                title: "BƯỚC 4: QUYẾT ĐỊNH MUA HÀNG",
+                prompt: "Bạn quyết định mua dòng máy phân khúc cận cao cấp. Nhưng lúc ra cửa hàng, nhân viên báo mẫu màu bạn thích đã hết và bạn bè xung quanh khuyên mẫu này chụp ảnh không đẹp.",
+                options: [
+                    { text: "Từ bỏ không mua nữa, ra về dùng tiếp chiếc máy hỏng màn hình.", correct: false, feedback: "Bạn đã bị khuất phục bởi 'Yếu tố can thiệp bất ngờ' và 'Thái độ của người khác'. Quyết định mua của bạn bị gián đoạn." },
+                    { text: "Linh hoạt lựa chọn màu sắc khác có sẵn, tin cậy vào các thông số khoa học hơn ý kiến cảm tính xung quanh.", correct: true, feedback: "Bản lĩnh! Bạn đã vượt qua các yếu tố cản trở tại điểm bán (thái độ người xung quanh, sự khan hiếm hàng) để hiện thực hóa hành vi mua hàng." }
+                ]
+            },
+            {
+                step: 5,
+                title: "BƯỚC 5: HÀNH VI SAU MUA",
+                prompt: "Sử dụng chiếc điện thoại mới tuần đầu, bạn học tập mượt màng, slide slide hiển thị sắc nét giúp bạn làm bài nhóm hiệu quả.",
+                options: [
+                    { text: "Hài lòng sâu sắc, viết đánh giá tốt và khuyên bạn bè cùng lớp UEL nên tin dùng dòng máy này.", correct: true, feedback: "Hành trình trọn vẹn! Trải nghiệm vượt mong đợi đã biến bạn thành khách hàng trung thành, triệt tiêu sự 'bất hòa nhận thức' và tự nguyện marketing truyền miệng cho hãng sữa/máy." }
+                ]
+            }
+        ];
+
+        let currentCaseIdx = 0;
+        let selectedOptionIdx = null;
+        let hasAnswered = false;
+
+        function renderCaseStep() {
+            const data = caseSteps[currentCaseIdx];
+            const caseBox = document.getElementById('caseBox');
+            
+            // Update Stepper UI State
+            for (let i = 1; i <= 5; i++) {
+                const dot = document.getElementById(`step-dot-${i}`);
+                const line = document.getElementById(`step-line-${i}`);
+                
+                if (i < currentCaseIdx + 1) {
+                    dot.className = "w-8 h-8 rounded-full bg-emerald-500 border-emerald-500 text-white flex items-center justify-center text-xs font-bold transition-all shadow-sm";
+                    dot.innerHTML = "✓";
+                    if (line) line.className = "h-0.5 w-4 md:w-8 bg-emerald-500 transition-all";
+                } else if (i === currentCaseIdx + 1) {
+                    dot.className = "w-8 h-8 rounded-full bg-indigo-600 border-indigo-600 text-white flex items-center justify-center text-xs font-bold transition-all shadow-md scale-110";
+                    dot.innerHTML = i;
+                    if (line) line.className = "h-0.5 w-4 md:w-8 bg-slate-200 transition-all";
+                } else {
+                    dot.className = "w-8 h-8 rounded-full border-2 border-slate-200 text-slate-400 bg-white flex items-center justify-center text-xs font-bold transition-all";
+                    dot.innerHTML = i;
+                    if (line) line.className = "h-0.5 w-4 md:w-8 bg-slate-200 transition-all";
+                }
+            }
+
+            // Options Renderer
+            let optionsHtml = "";
+            data.options.forEach((opt, idx) => {
+                let btnStyle = "bg-white border-slate-200 text-slate-800 hover:border-indigo-400 hover:bg-indigo-50/20";
+                
+                if (hasAnswered) {
+                    if (idx === selectedOptionIdx) {
+                        btnStyle = opt.correct 
+                            ? "bg-emerald-50 border-emerald-500 text-emerald-900 ring-2 ring-emerald-500/20 font-semibold" 
+                            : "bg-rose-50 border-rose-500 text-rose-900 ring-2 ring-rose-500/20 font-semibold";
+                    } else {
+                        btnStyle = "bg-white border-slate-200 text-slate-400 opacity-60 cursor-not-allowed";
+                    }
+                }
+
+                optionsHtml += `
+                    <button onclick="chooseCaseOption(${idx})" ${hasAnswered ? 'disabled' : ''} class="w-full p-4 rounded-xl text-left text-xs border transition-all duration-300 flex justify-between items-center ${btnStyle}">
+                        <span>${opt.text}</span>
+                        ${idx === selectedOptionIdx ? (opt.correct ? '<span class="text-emerald-600 font-bold ml-2">✓ Đúng</span>' : '<span class="text-rose-600 font-bold ml-2">✗ Sai</span>') : ''}
+                    </button>
+                `;
+            });
+
+            // Feedback and Next Button
+            let feedbackHtml = "";
+            if (hasAnswered) {
+                const chosen = data.options[selectedOptionIdx];
+                const alertClass = chosen.correct 
+                    ? "bg-emerald-50 border-emerald-200 text-emerald-800" 
+                    : "bg-rose-50 border-rose-200 text-rose-800";
+                
+                feedbackHtml = `
+                    <div class="p-4 rounded-xl border ${alertClass} text-xs leading-relaxed space-y-2 animate-fade-in mt-4">
+                        <p class="font-bold flex items-center gap-1.5">
+                            ${chosen.correct ? '💡 GIẢI THÍCH HỌC THUẬT:' : '⚠️ LƯU Ý MARKETING:'}
+                        </p>
+                        <p>${chosen.feedback}</p>
+                    </div>
+                    <div class="flex justify-end pt-2">
+                        <button onclick="advanceCaseStep()" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-gothic font-bold text-xs tracking-wider rounded-full shadow-md hover:shadow-indigo-500/20 transform active:scale-95 transition-all">
+                            ${currentCaseIdx === 4 ? 'Hoàn thành nhập vai 🏁' : 'Giai đoạn tiếp theo ➔'}
+                        </button>
+                    </div>
+                `;
+            }
+
+            caseBox.innerHTML = `
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-indigo-600 font-extrabold font-gothic tracking-widest uppercase">${data.title}</span>
+                        <span class="text-slate-400 font-mono">Giai đoạn: <strong class="text-indigo-600">${currentCaseIdx + 1}</strong>/5</span>
+                    </div>
+                    <p class="text-xs sm:text-sm text-slate-700 leading-relaxed font-sans font-medium bg-white p-4 rounded-xl border border-slate-200/60 shadow-sm">
+                        "${data.prompt}"
+                    </p>
+                    <div class="grid grid-cols-1 gap-2.5">
+                        ${optionsHtml}
+                    </div>
+                    ${feedbackHtml}
+                </div>
+            `;
+        }
+
+        function chooseCaseOption(idx) {
+            if (hasAnswered) return;
+            selectedOptionIdx = idx;
+            hasAnswered = true;
+            
+            const data = caseSteps[currentCaseIdx];
+            const chosen = data.options[idx];
+            
+            if (chosen.correct) {
+                playSpookyBeep(523, 'sine', 0.2, 0.05);
+            } else {
+                playSpookyBeep(220, 'triangle', 0.3, 0.05);
+            }
+            
+            renderCaseStep();
+        }
+
+        function advanceCaseStep() {
+            if (currentCaseIdx < 4) {
+                currentCaseIdx++;
+                selectedOptionIdx = null;
+                hasAnswered = false;
+                renderCaseStep();
+            } else {
+                showCaseCompletionScreen();
+            }
+        }
+
+        function showCaseCompletionScreen() {
+            const caseBox = document.getElementById('caseBox');
+            playSpookyBeep(523.25, 'sine', 0.2, 0.1);
+            setTimeout(() => { playSpookyBeep(659.25, 'sine', 0.2, 0.1); }, 150);
+            setTimeout(() => { playSpookyBeep(783.99, 'sine', 0.2, 0.1); }, 300);
+
+            caseBox.innerHTML = `
+                <div class="text-center py-8 space-y-6 animate-fade-in max-w-xl mx-auto">
+                    <div class="w-16 h-16 bg-emerald-50 border-2 border-emerald-500 rounded-full flex items-center justify-center mx-auto text-emerald-600 text-3xl">
+                        🎉
+                    </div>
+                    <div class="space-y-2">
+                        <h4 class="font-gothic text-lg font-extrabold text-slate-900 uppercase">CHÚC MỪNG BẠN ĐÃ TỐT NGHIỆP!</h4>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            Bạn đã hoàn thành xuất sắc chuyến du hành 5 giai đoạn ra quyết định mua sắm của sinh viên UEL. Bạn nay đã hiểu rõ cách các Marketer tài ba điều hướng bộ não người tiêu dùng!
+                        </p>
+                    </div>
+                    <button onclick="resetRoleplay()" class="px-8 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-gothic font-bold text-xs tracking-wider rounded-full shadow-lg hover:shadow-emerald-500/20 active:scale-95 transition-all">
+                        Chạy lại kịch bản Nhập vai ↩
+                    </button>
+                </div>
+            `;
+        }
+
+        function resetRoleplay() {
+            currentCaseIdx = 0;
+            selectedOptionIdx = null;
+            hasAnswered = false;
+            renderCaseStep();
+        }
+
+        // QUIZ SYSTEM LOGIC (SÁNG - Nâng cấp lên 10 CÂU HOÀN CHỈNH)
+        const quizQuestions = [
+            {
+                q: "Marketer cần tác động mạnh nhất vào cảm xúc để kích hoạt nhận thức của khách hàng ở giai đoạn nào?",
+                choices: [
+                    { text: "Tìm kiếm thông tin", correct: false },
+                    { text: "Nhận biết nhu cầu", correct: true },
+                    { text: "Đánh giá các phương án", correct: false },
+                    { text: "Hành vi sau mua", correct: false }
+                ]
+            },
+            {
+                q: "Yếu tố can thiệp nào có khả năng ngăn cản ý định mua hàng chuyển hóa thành hành vi mua thực tế?",
+                choices: [
+                    { text: "Thái độ của người khác và các tình huống bất định", correct: true },
+                    { text: "Mức độ hài lòng sau mua", correct: false },
+                    { text: "Sự bất hòa nhận thức", correct: false },
+                    { text: "Kích thích nội tại cơ thể", correct: false }
+                ]
+            },
+            {
+                q: "Hiện tượng bất hòa nhận thức (Cognitive Dissonance) xảy ra ở giai đoạn nào?",
+                choices: [
+                    { text: "Trước khi nhận biết nhu cầu", correct: false },
+                    { text: "Tìm kiếm giải pháp", correct: false },
+                    { text: "Quyết định mua sản phẩm", correct: false },
+                    { text: "Hành vi sau mua hàng", correct: true }
+                ]
+            },
+            {
+                q: "Nguồn thông tin nào sau đây thường có độ tin cậy và trọng lượng cảm xúc cao nhất đối với người tiêu dùng khi tìm kiếm thông tin?",
+                choices: [
+                    { text: "Nguồn thương mại (Quảng cáo, website nhãn hàng)", correct: false },
+                    { text: "Nguồn cá nhân (Gia đình, bạn bè, người quen)", correct: true },
+                    { text: "Nguồn công cộng (Báo chí, đánh giá độc lập)", correct: false },
+                    { text: "Nguồn kinh nghiệm tự thân", correct: false }
+                ]
+            },
+            {
+                q: "Tập hợp các thương hiệu mà người tiêu dùng thực tế cân nhắc lựa chọn sau khi kết thúc việc dò tìm manh mối được gọi là gì?",
+                choices: [
+                    { text: "Tập hợp nhận biết (Awareness set)", correct: false },
+                    { text: "Tập hợp cân nhắc (Consideration set)", correct: true },
+                    { text: "Tập hợp lựa chọn (Choice set)", correct: false },
+                    { text: "Tập hợp loại trừ (Excluded set)", correct: false }
+                ]
+            },
+            {
+                q: "Khi khách hàng mua những nhu yếu phẩm lặp đi lặp lại hàng tuần như muối, kem đánh răng, họ trải qua loại hành vi quyết định nào?",
+                choices: [
+                    { text: "Hành vi mua sắm phức tạp (Complex buying behavior)", correct: false },
+                    { text: "Hành vi mua giảm bất hòa (Dissonance-reducing buying behavior)", correct: false },
+                    { text: "Hành vi mua theo thói quen (Habitual buying behavior)", correct: true },
+                    { text: "Hành vi mua tìm kiếm sự đa dạng (Variety-seeking buying behavior)", correct: false }
+                ]
+            },
+            {
+                q: "Mô hình nào giúp lượng hóa cách người tiêu dùng so sánh các thương hiệu bằng việc nhân điểm thuộc tính với trọng số quan trọng?",
+                choices: [
+                    { text: "Mô hình hộp đen ý thức", correct: false },
+                    { text: "Mô hình đa thuộc tính (Multi-attribute model)", correct: true },
+                    { text: "Mô hình tháp nhu cầu Maslow", correct: false },
+                    { text: "Mô hình truyền thông AIDA", correct: false }
+                ]
+            },
+            {
+                q: "Trạng thái bất hòa nhận thức sau mua hàng mô tả cảm giác nào của người tiêu dùng?",
+                choices: [
+                    { text: "Cực kỳ hào hứng và hãnh diện vì sở hữu món đồ mới", correct: false },
+                    { text: "Nghi ngờ, lo lắng hoặc hối hận về lựa chọn của mình", correct: true },
+                    { text: "Không có bất kỳ cảm xúc nào liên quan", correct: false },
+                    { text: "Sẵn lòng chia sẻ mọi đánh giá tốt lên mạng xã hội", correct: false }
+                ]
+            },
+            {
+                q: "Kích thích nội tại (Internal Stimuli) đóng vai trò đánh thức nhu cầu thường bắt nguồn từ yếu tố nào?",
+                choices: [
+                    { text: "Nhìn thấy biển quảng cáo trà sữa bắt mắt trên đường", correct: false },
+                    { text: "Nhận được voucher giảm giá 50% qua ứng dụng", correct: false },
+                    { text: "Nhu cầu sinh học tự nhiên của cơ thể như đói bụng, khát nước", correct: true },
+                    { text: "Nghe bạn bè bàn tán xôn xao về mẫu giày thể thao mới", correct: false }
+                ]
+            },
+            {
+                q: "Một sinh viên chuẩn bị mua chiếc máy tính xách tay phục vụ việc học tập 4 năm đại học sẽ thực hiện hành vi mua sắm thuộc nhóm nào?",
+                choices: [
+                    { text: "Hành vi mua sắm phức tạp (Complex buying behavior)", correct: true },
+                    { text: "Hành vi mua theo thói quen (Habitual buying behavior)", correct: false },
+                    { text: "Hành vi mua tìm kiếm sự thay đổi nhãn hiệu", correct: false },
+                    { text: "Hành vi mua bốc đồng tùy hứng", correct: false }
+                ]
+            }
+        ];
+
+        let currentQuizIdx = 0;
+        let quizScore = 0;
+
+        function renderQuiz() {
+            const data = quizQuestions[currentQuizIdx];
+            document.getElementById('quizNum').innerText = currentQuizIdx + 1;
+            document.getElementById('quizQuestion').innerText = data.q;
+            document.getElementById('quizScore').innerText = `Điểm số: ${quizScore * 10}`;
+
+            let html = "";
+            data.choices.forEach((choice, idx) => {
+                html += `
+                    <button onclick="answerQuiz(${idx})" class="w-full p-4 rounded-xl text-left text-xs bg-slate-50 border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50/40 transition-all duration-300 text-slate-800 font-medium">
+                        <span class="font-bold text-emerald-600 mr-2">${String.fromCharCode(65 + idx)}.</span> ${choice.text}
+                    </button>
+                `;
+            });
+            document.getElementById('quizChoices').innerHTML = html;
+        }
+
+        function answerQuiz(idx) {
+            const data = quizQuestions[currentQuizIdx];
+            const choice = data.choices[idx];
+
+            if (choice.correct) {
+                quizScore++;
+                playSpookyBeep(660, 'sine', 0.2, 0.05);
+            } else {
+                playSpookyBeep(180, 'sawtooth', 0.3, 0.05);
+            }
+
+            if (currentQuizIdx < quizQuestions.length - 1) {
+                currentQuizIdx++;
+                renderQuiz();
+            } else {
+                // End of quiz - Show score screen
+                document.getElementById('quiz-screen').classList.add('hidden');
+                document.getElementById('quiz-result-screen').classList.remove('hidden');
+                
+                const finalScore = quizScore * 10;
+                const scoreBox = document.getElementById('quizResultGlow');
+                scoreBox.innerText = `${finalScore}`;
+                
+                let feedbackText = "";
+                if (finalScore >= 90) {
+                    feedbackText = "Xuất sắc! Bạn là một bậc thầy thực thụ về tâm lý học Marketing. Bạn hoàn toàn xứng đáng nhận được điểm 10 tuyệt đối từ cô Dung và sự kính trọng từ nhóm GivemeA+pls!";
+                    scoreBox.className = "w-20 h-20 bg-emerald-50 border-2 border-emerald-500 rounded-full flex items-center justify-center mx-auto text-emerald-600 text-2xl font-bold animate-bounce";
+                } else if (finalScore >= 60) {
+                    feedbackText = "Khá tốt! Bạn đã nắm chắc những kiến thức căn bản của Quá trình Quyết định mua hàng. Hãy rà soát lại để đạt điểm tối đa nhé!";
+                    scoreBox.className = "w-20 h-20 bg-yellow-50 border-2 border-yellow-500 rounded-full flex items-center justify-center mx-auto text-yellow-600 text-2xl font-bold";
+                } else {
+                    feedbackText = "Hãy cẩn thận! Những cám dỗ tiếp thị đang làm bạn lu mờ lý trí. Hãy đọc lại thật kỹ 5 giai đoạn tâm lý bên trên để chuẩn bị tốt hơn.";
+                    scoreBox.className = "w-20 h-20 bg-red-50 border-2 border-red-500 rounded-full flex items-center justify-center mx-auto text-red-600 text-2xl font-bold";
+                }
+                document.getElementById('quizResultMessage').innerText = feedbackText;
+            }
+        }
+
+        function restartQuiz() {
+            currentQuizIdx = 0;
+            quizScore = 0;
+            document.getElementById('quiz-screen').classList.remove('hidden');
+            document.getElementById('quiz-result-screen').classList.add('hidden');
+            renderQuiz();
+        }
+
+        // INITIALIZATION
+        window.onload = function() {
+            generateGrass();
+            renderCaseStep(); // Initialize beautiful roleplay
+            renderQuiz();
+
+            document.getElementById('skipBtn').classList.remove('hidden');
+            document.getElementById('skipBtn').addEventListener('click', (e) => {
+                e.preventDefault();
+                const heart = document.getElementById('heart-of-world');
+                heart.classList.remove('hidden');
+                const navBtn = document.getElementById('navHeartBtn');
+                navBtn.classList.remove('text-slate-500', 'cursor-not-allowed');
+                navBtn.classList.add('text-pink-400');
+                
+                heart.scrollIntoView({ behavior: 'smooth' });
+                setStage(1);
+                switchBrandCase('kun'); // Init brand cases
+                showCustomNotification("Dịch chuyển thành công tới kho tàng tri thức!");
+            });
+        }
+    </script>
+</body>
+</html>
